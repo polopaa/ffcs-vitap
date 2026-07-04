@@ -3291,8 +3291,8 @@ field ${k2} -> ${e3.message}`, {
           x3[expectKey] = [];
           expectedRecordIdx++;
         } else {
-          const expectedFields = this._fields.map(([name]) => name).join(", ");
-          const receivedFields = record._fields.map(([name]) => name).join(", ");
+          const expectedFields = this._fields.map(([name2]) => name2).join(", ");
+          const receivedFields = record._fields.map(([name2]) => name2).join(", ");
           throw new CandidDecodeError(`Cannot find required field '${expectKey}' in record, expected fields: [${expectedFields}], received fields: [${receivedFields}]`);
         }
       } else {
@@ -3304,8 +3304,8 @@ field ${k2} -> ${e3.message}`, {
       if (expectType instanceof OptClass || expectType instanceof ReservedClass) {
         x3[expectKey] = [];
       } else {
-        const expectedFields = this._fields.map(([name]) => name).join(", ");
-        const receivedFields = record._fields.map(([name]) => name).join(", ");
+        const expectedFields = this._fields.map(([name2]) => name2).join(", ");
+        const receivedFields = record._fields.map(([name2]) => name2).join(", ");
         throw new CandidDecodeError(`Cannot find required field '${expectKey}' in record, expected fields: [${expectedFields}], received fields: [${receivedFields}]`);
       }
     }
@@ -3313,8 +3313,8 @@ field ${k2} -> ${e3.message}`, {
   }
   get fieldsAsObject() {
     const fields = {};
-    for (const [name, ty] of this._fields) {
-      fields[idlLabelToId(name)] = ty;
+    for (const [name2, ty] of this._fields) {
+      fields[idlLabelToId(name2)] = ty;
     }
     return fields;
   }
@@ -3427,10 +3427,10 @@ variant ${k2} -> ${e3.message}`, {
   }
   encodeValue(x3) {
     for (let i = 0; i < this._fields.length; i++) {
-      const [name, type] = this._fields[i];
-      if (x3.hasOwnProperty(name)) {
+      const [name2, type] = this._fields[i];
+      if (x3.hasOwnProperty(name2)) {
         const idx = lebEncode(i);
-        const buf = type.encodeValue(x3[name]);
+        const buf = type.encodeValue(x3[name2]);
         return concat(idx, buf);
       }
     }
@@ -3461,7 +3461,7 @@ variant ${k2} -> ${e3.message}`, {
         return { [key]: value };
       }
     }
-    const expectedFields = this._fields.map(([name]) => name).join(", ");
+    const expectedFields = this._fields.map(([name2]) => name2).join(", ");
     throw new CandidDecodeError(`Cannot find field hash ${wireHash} in variant, expected fields: [${expectedFields}]`);
   }
   get name() {
@@ -3473,21 +3473,21 @@ variant ${k2} -> ${e3.message}`, {
     return `variant {${fields.join("; ")}}`;
   }
   valueToString(x3) {
-    for (const [name, type] of this._fields) {
-      if (x3.hasOwnProperty(name)) {
-        const value = type.valueToString(x3[name]);
+    for (const [name2, type] of this._fields) {
+      if (x3.hasOwnProperty(name2)) {
+        const value = type.valueToString(x3[name2]);
         if (value === "null") {
-          return `variant {${name}}`;
+          return `variant {${name2}}`;
         }
-        return `variant {${name}=${value}}`;
+        return `variant {${name2}=${value}}`;
       }
     }
     throw new Error(`Variant has no data: ${x3}`);
   }
   get alternativesAsObject() {
     const alternatives = {};
-    for (const [name, ty] of this._fields) {
-      alternatives[idlLabelToId(name)] = ty;
+    for (const [name2, ty] of this._fields) {
+      alternatives[idlLabelToId(name2)] = ty;
     }
     return alternatives;
   }
@@ -3754,8 +3754,8 @@ class ServiceClass extends ConstructType {
   }
   fieldsAsObject() {
     const fields = {};
-    for (const [name, ty] of this._fields) {
-      fields[name] = ty;
+    for (const [name2, ty] of this._fields) {
+      fields[name2] = ty;
     }
     return fields;
   }
@@ -3955,8 +3955,8 @@ function decode$2(retTypes, bytes) {
       case IDLTypeIds.Record: {
         const fields = {};
         for (const [hash, ty] of entry[1]) {
-          const name = `_${hash}_`;
-          fields[name] = getType(ty);
+          const name2 = `_${hash}_`;
+          fields[name2] = getType(ty);
         }
         const record = Record(fields);
         const tuple = record.tryAsTuple();
@@ -3968,8 +3968,8 @@ function decode$2(retTypes, bytes) {
       case IDLTypeIds.Variant: {
         const fields = {};
         for (const [hash, ty] of entry[1]) {
-          const name = `_${hash}_`;
-          fields[name] = getType(ty);
+          const name2 = `_${hash}_`;
+          fields[name2] = getType(ty);
         }
         return Variant(fields);
       }
@@ -3980,7 +3980,7 @@ function decode$2(retTypes, bytes) {
       case IDLTypeIds.Service: {
         const rec = {};
         const methods = entry[1];
-        for (const [name, typeRef] of methods) {
+        for (const [name2, typeRef] of methods) {
           let type = getType(typeRef);
           if (type instanceof RecClass) {
             type = type.getType();
@@ -3988,7 +3988,7 @@ function decode$2(retTypes, bytes) {
           if (!(type instanceof FuncClass)) {
             throw new Error("Illegal service definition: services can only contain functions");
           }
-          rec[name] = type;
+          rec[name2] = type;
         }
         return Service(rec);
       }
@@ -4229,8 +4229,8 @@ function subtype_(relations, t12, t2) {
   }
   if (t12 instanceof ServiceClass && t2 instanceof ServiceClass) {
     const t1Object = t12.fieldsAsObject();
-    for (const [name, ty2] of t2._fields) {
-      const ty1 = t1Object[name];
+    for (const [name2, ty2] of t2._fields) {
+      const ty1 = t1Object[name2];
       if (!ty1) {
         return false;
       }
@@ -9448,10 +9448,10 @@ openDb_fn = async function() {
   db.close();
   return __privateMethod(this, _IndexedDBExpirableStore_instances, openRequest_fn).call(this, nextVersion);
 };
-openRequest_fn = function(version) {
+openRequest_fn = function(version2) {
   const storeName = __privateGet(this, _storeName);
   return new Promise((resolve, reject) => {
-    const request2 = globalThis.indexedDB.open(__privateGet(this, _dbName), version);
+    const request2 = globalThis.indexedDB.open(__privateGet(this, _dbName), version2);
     request2.onupgradeneeded = () => {
       const db = request2.result;
       if (!db.objectStoreNames.contains(storeName)) {
@@ -10147,8 +10147,8 @@ const _HttpAgent = class _HttpAgent {
     });
     __privateSet(this, _backoffStrategy, options.backoffStrategy || defaultBackoffFactory);
     if (options.credentials) {
-      const { name, password } = options.credentials;
-      __privateSet(this, _credentials, `${name}${password ? `:${password}` : ""}`);
+      const { name: name2, password } = options.credentials;
+      __privateSet(this, _credentials, `${name2}${password ? `:${password}` : ""}`);
     }
     __privateSet(this, _identity, Promise.resolve(options.identity || new AnonymousIdentity()));
     if (options.ingressExpiryInMinutes && options.ingressExpiryInMinutes > 5) {
@@ -11678,7 +11678,7 @@ class StorageClient {
     return chunks;
   }
 }
-var define_process_env_default$1 = {};
+var define_process_env_default$2 = {};
 const DEFAULT_STORAGE_GATEWAY_URL = "https://blob.caffeine.ai";
 const DEFAULT_BUCKET_NAME = "default-bucket";
 const DEFAULT_PROJECT_ID = "0000000-0000-0000-0000-00000000000";
@@ -11687,8 +11687,8 @@ async function loadConfig() {
   if (configCache) {
     return configCache;
   }
-  const backendCanisterId = define_process_env_default$1.CANISTER_ID_BACKEND;
-  const envBaseUrl = define_process_env_default$1.BASE_URL || "/";
+  const backendCanisterId = define_process_env_default$2.CANISTER_ID_BACKEND;
+  const envBaseUrl = define_process_env_default$2.BASE_URL || "/";
   const baseUrl = envBaseUrl.endsWith("/") ? envBaseUrl : `${envBaseUrl}/`;
   try {
     const response = await fetch(`${baseUrl}env.json`);
@@ -15818,12 +15818,12 @@ class Signer {
         }
         return standards.map((item) => {
           const obj = asRecord(item);
-          const name = asString(obj == null ? void 0 : obj.name);
+          const name2 = asString(obj == null ? void 0 : obj.name);
           const url = asString(obj == null ? void 0 : obj.url);
-          if (name === void 0 || url === void 0) {
+          if (name2 === void 0 || url === void 0) {
             throw new Error("Expected { name, url }");
           }
-          return { name, url };
+          return { name: name2, url };
         });
       }
     });
@@ -16347,8 +16347,8 @@ const _IdleManager = class _IdleManager {
     __privateSet(this, _idleTimeout, idleTimeout);
     __privateSet(this, _resetTimer, this._resetTimer.bind(this));
     window.addEventListener("load", __privateGet(this, _resetTimer), true);
-    events.forEach((name) => {
-      document.addEventListener(name, __privateGet(this, _resetTimer), true);
+    events.forEach((name2) => {
+      document.addEventListener(name2, __privateGet(this, _resetTimer), true);
     });
     const debounce2 = (func, wait) => {
       let timeout2;
@@ -16402,8 +16402,8 @@ const _IdleManager = class _IdleManager {
   exit() {
     clearTimeout(__privateGet(this, _timeoutID));
     window.removeEventListener("load", __privateGet(this, _resetTimer), true);
-    events.forEach((name) => {
-      document.removeEventListener(name, __privateGet(this, _resetTimer), true);
+    events.forEach((name2) => {
+      document.removeEventListener(name2, __privateGet(this, _resetTimer), true);
     });
     __privateGet(this, _callbacks).forEach((cb) => {
       cb();
@@ -16567,8 +16567,8 @@ function wrap(value) {
   return newValue;
 }
 const unwrap = (value) => reverseTransformCache.get(value);
-function openDB(name, version, { blocked, upgrade, blocking, terminated } = {}) {
-  const request2 = indexedDB.open(name, version);
+function openDB(name2, version2, { blocked, upgrade, blocking, terminated } = {}) {
+  const request2 = indexedDB.open(name2, version2);
   const openPromise = wrap(request2);
   if (upgrade) {
     request2.addEventListener("upgradeneeded", (event) => {
@@ -16631,13 +16631,13 @@ replaceTraps((oldTraps) => ({
 }));
 const AUTH_DB_NAME = "auth-client-db";
 const OBJECT_STORE_NAME = "ic-keyval";
-const _openDbStore = async (dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version) => {
+const _openDbStore = async (dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version2) => {
   var _a2;
   if ((_a2 = globalThis.localStorage) == null ? void 0 : _a2.getItem(KEY_STORAGE_DELEGATION)) {
     globalThis.localStorage.removeItem(KEY_STORAGE_DELEGATION);
     globalThis.localStorage.removeItem(KEY_STORAGE_KEY);
   }
-  return await openDB(dbName, version, {
+  return await openDB(dbName, version2, {
     upgrade: (database) => {
       if (database.objectStoreNames.contains(storeName)) {
         database.clear(storeName);
@@ -16672,8 +16672,8 @@ class IdbKeyVal {
    * @param {DBCreateOptions['version']} options.version version of the database. Increment to safely upgrade
    */
   static async create(options) {
-    const { dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version = DB_VERSION } = options ?? {};
-    const db = await _openDbStore(dbName, storeName, version);
+    const { dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version: version2 = DB_VERSION } = options ?? {};
+    const db = await _openDbStore(dbName, storeName, version2);
     return new IdbKeyVal(db, storeName);
   }
   /**
@@ -17108,14 +17108,14 @@ async function migrateFromLocalStorage(storage, keyType) {
     return null;
   }
 }
-var define_process_env_default = {};
+var define_process_env_default$1 = {};
 const iiAttributesIDL = ({ IDL: I2 }) => I2.Service({
   _internet_identity_sign_in_start: I2.Func([], [I2.Vec(I2.Nat8)], []),
   _internet_identity_sign_in_finish: I2.Func([], [I2.Variant({ ok: I2.Null, err: I2.Record({}) })], []),
   _initialize_access_control: I2.Func([], [], [])
 });
 const II_MAINNET_CANISTER_ID = "rdmx6-jaaaa-aaaaa-aaadq-cai";
-const II_SIGNER_CANISTER_ID = define_process_env_default.II_CANISTER_ID ?? II_MAINNET_CANISTER_ID;
+const II_SIGNER_CANISTER_ID = define_process_env_default$1.II_CANISTER_ID ?? II_MAINNET_CANISTER_ID;
 const ONE_HOUR_IN_NANOSECONDS = BigInt(36e11);
 const DEFAULT_IDENTITY_PROVIDER = "https://id.ai/authorize";
 const DEFAULT_ATTRIBUTE_KEYS = ["verified_email"];
@@ -17345,6 +17345,171 @@ function useActor(createActor2) {
     actor: actorQuery.data || null,
     isFetching: actorQuery.isFetching
   };
+}
+var define_process_env_default = {};
+var initQueue = () => {
+  if (window.va) return;
+  window.va = function a2(...params) {
+    if (!window.vaq) window.vaq = [];
+    window.vaq.push(params);
+  };
+};
+var name = "@vercel/analytics";
+var version = "2.0.1";
+function isBrowser() {
+  return typeof window !== "undefined";
+}
+function detectEnvironment() {
+  try {
+    const env = "production";
+    if (env === "development" || env === "test") ;
+  } catch {
+  }
+  return "production";
+}
+function setMode(mode = "auto") {
+  if (mode === "auto") {
+    window.vam = detectEnvironment();
+    return;
+  }
+  window.vam = mode;
+}
+function getMode() {
+  const mode = isBrowser() ? window.vam : detectEnvironment();
+  return mode || "production";
+}
+function isDevelopment() {
+  return getMode() === "development";
+}
+function getScriptSrc(props) {
+  if (props.scriptSrc) {
+    return makeAbsolute(props.scriptSrc);
+  }
+  if (isDevelopment()) {
+    return "https://va.vercel-scripts.com/v1/script.debug.js";
+  }
+  if (props.basePath) {
+    return makeAbsolute(`${props.basePath}/insights/script.js`);
+  }
+  return "/_vercel/insights/script.js";
+}
+function loadProps(explicitProps, confString) {
+  var _a2;
+  let props = explicitProps;
+  if (confString) {
+    try {
+      props = {
+        ...(_a2 = JSON.parse(confString)) == null ? void 0 : _a2.analytics,
+        ...explicitProps
+      };
+    } catch {
+    }
+  }
+  setMode(props.mode);
+  const dataset = {
+    sdkn: name + (props.framework ? `/${props.framework}` : ""),
+    sdkv: version
+  };
+  if (props.disableAutoTrack) {
+    dataset.disableAutoTrack = "1";
+  }
+  if (props.viewEndpoint) {
+    dataset.viewEndpoint = makeAbsolute(props.viewEndpoint);
+  }
+  if (props.eventEndpoint) {
+    dataset.eventEndpoint = makeAbsolute(props.eventEndpoint);
+  }
+  if (props.sessionEndpoint) {
+    dataset.sessionEndpoint = makeAbsolute(props.sessionEndpoint);
+  }
+  if (isDevelopment() && props.debug === false) {
+    dataset.debug = "false";
+  }
+  if (props.dsn) {
+    dataset.dsn = props.dsn;
+  }
+  if (props.endpoint) {
+    dataset.endpoint = props.endpoint;
+  } else if (props.basePath) {
+    dataset.endpoint = makeAbsolute(`${props.basePath}/insights`);
+  }
+  return {
+    beforeSend: props.beforeSend,
+    src: getScriptSrc(props),
+    dataset
+  };
+}
+function makeAbsolute(url) {
+  return url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/") ? url : `/${url}`;
+}
+function inject(props = {
+  debug: true
+}, confString) {
+  var _a2;
+  if (!isBrowser()) return;
+  const { beforeSend, src, dataset } = loadProps(props, confString);
+  initQueue();
+  if (beforeSend) {
+    (_a2 = window.va) == null ? void 0 : _a2.call(window, "beforeSend", beforeSend);
+  }
+  if (document.head.querySelector(`script[src*="${src}"]`)) return;
+  const script = document.createElement("script");
+  script.src = src;
+  for (const [key, value] of Object.entries(dataset)) {
+    script.dataset[key] = value;
+  }
+  script.defer = true;
+  script.onerror = () => {
+    const errorMessage = isDevelopment() ? "Please check if any ad blockers are enabled and try again." : "Be sure to enable Web Analytics for your project and deploy again. See https://vercel.com/docs/analytics/quickstart for more information.";
+    console.log(
+      `[Vercel Web Analytics] Failed to load script from ${src}. ${errorMessage}`
+    );
+  };
+  document.head.appendChild(script);
+}
+function pageview({
+  route,
+  path
+}) {
+  var _a2;
+  (_a2 = window.va) == null ? void 0 : _a2.call(window, "pageview", { route, path });
+}
+function getBasePath() {
+  if (typeof process === "undefined" || typeof define_process_env_default === "undefined") {
+    return void 0;
+  }
+  return define_process_env_default.REACT_APP_VERCEL_OBSERVABILITY_BASEPATH;
+}
+function getConfigString() {
+  if (typeof process === "undefined" || typeof define_process_env_default === "undefined") {
+    return void 0;
+  }
+  return define_process_env_default.REACT_APP_VERCEL_OBSERVABILITY_CLIENT_CONFIG;
+}
+function Analytics(props) {
+  reactExports.useEffect(() => {
+    var _a2;
+    if (props.beforeSend) {
+      (_a2 = window.va) == null ? void 0 : _a2.call(window, "beforeSend", props.beforeSend);
+    }
+  }, [props.beforeSend]);
+  reactExports.useEffect(() => {
+    inject(
+      {
+        framework: props.framework || "react",
+        basePath: props.basePath ?? getBasePath(),
+        ...props.route !== void 0 && { disableAutoTrack: true },
+        ...props
+      },
+      props.configString ?? getConfigString()
+    );
+  }, []);
+  reactExports.useEffect(() => {
+    if (props.route && props.path) {
+      pageview({ route: props.route, path: props.path });
+    }
+  }, [props.route, props.path]);
+  return null;
 }
 var client = { exports: {} };
 var reactDomClient_production = {};
@@ -18326,56 +18491,56 @@ function isAttributeNameSafe(attributeName) {
   illegalAttributeNameCache[attributeName] = true;
   return false;
 }
-function setValueForAttribute(node, name, value) {
-  if (isAttributeNameSafe(name))
-    if (null === value) node.removeAttribute(name);
+function setValueForAttribute(node, name2, value) {
+  if (isAttributeNameSafe(name2))
+    if (null === value) node.removeAttribute(name2);
     else {
       switch (typeof value) {
         case "undefined":
         case "function":
         case "symbol":
-          node.removeAttribute(name);
+          node.removeAttribute(name2);
           return;
         case "boolean":
-          var prefix$8 = name.toLowerCase().slice(0, 5);
+          var prefix$8 = name2.toLowerCase().slice(0, 5);
           if ("data-" !== prefix$8 && "aria-" !== prefix$8) {
-            node.removeAttribute(name);
+            node.removeAttribute(name2);
             return;
           }
       }
-      node.setAttribute(name, "" + value);
+      node.setAttribute(name2, "" + value);
     }
 }
-function setValueForKnownAttribute(node, name, value) {
-  if (null === value) node.removeAttribute(name);
+function setValueForKnownAttribute(node, name2, value) {
+  if (null === value) node.removeAttribute(name2);
   else {
     switch (typeof value) {
       case "undefined":
       case "function":
       case "symbol":
       case "boolean":
-        node.removeAttribute(name);
+        node.removeAttribute(name2);
         return;
     }
-    node.setAttribute(name, "" + value);
+    node.setAttribute(name2, "" + value);
   }
 }
-function setValueForNamespacedAttribute(node, namespace, name, value) {
-  if (null === value) node.removeAttribute(name);
+function setValueForNamespacedAttribute(node, namespace, name2, value) {
+  if (null === value) node.removeAttribute(name2);
   else {
     switch (typeof value) {
       case "undefined":
       case "function":
       case "symbol":
       case "boolean":
-        node.removeAttribute(name);
+        node.removeAttribute(name2);
         return;
     }
-    node.setAttributeNS(namespace, name, "" + value);
+    node.setAttributeNS(namespace, name2, "" + value);
   }
 }
 var prefix$1, suffix;
-function describeBuiltInComponentFrame(name) {
+function describeBuiltInComponentFrame(name2) {
   if (void 0 === prefix$1)
     try {
       throw Error();
@@ -18384,7 +18549,7 @@ function describeBuiltInComponentFrame(name) {
       prefix$1 = match && match[1] || "";
       suffix = -1 < x3.stack.indexOf("\n    at") ? " (<anonymous>)" : -1 < x3.stack.indexOf("@") ? "@unknown:0:0" : "";
     }
-  return "\n" + prefix$1 + name + suffix;
+  return "\n" + prefix$1 + name2 + suffix;
 }
 var reentry = false;
 function describeNativeComponentFrame(fn, construct) {
@@ -18596,7 +18761,7 @@ function escapeSelectorAttributeValueInsideDoubleQuotes(value) {
     }
   );
 }
-function updateInput(element, value, defaultValue, lastDefaultValue, checked, defaultChecked, type, name) {
+function updateInput(element, value, defaultValue, lastDefaultValue, checked, defaultChecked, type, name2) {
   element.name = "";
   null != type && "function" !== typeof type && "symbol" !== typeof type && "boolean" !== typeof type ? element.type = type : element.removeAttribute("type");
   if (null != value)
@@ -18610,9 +18775,9 @@ function updateInput(element, value, defaultValue, lastDefaultValue, checked, de
   null != value ? setDefaultValue(element, type, getToStringValue(value)) : null != defaultValue ? setDefaultValue(element, type, getToStringValue(defaultValue)) : null != lastDefaultValue && element.removeAttribute("value");
   null == checked && null != defaultChecked && (element.defaultChecked = !!defaultChecked);
   null != checked && (element.checked = checked && "function" !== typeof checked && "symbol" !== typeof checked);
-  null != name && "function" !== typeof name && "symbol" !== typeof name && "boolean" !== typeof name ? element.name = "" + getToStringValue(name) : element.removeAttribute("name");
+  null != name2 && "function" !== typeof name2 && "symbol" !== typeof name2 && "boolean" !== typeof name2 ? element.name = "" + getToStringValue(name2) : element.removeAttribute("name");
 }
-function initInput(element, value, defaultValue, checked, defaultChecked, type, name, isHydrating2) {
+function initInput(element, value, defaultValue, checked, defaultChecked, type, name2, isHydrating2) {
   null != type && "function" !== typeof type && "symbol" !== typeof type && "boolean" !== typeof type && (element.type = type);
   if (null != value || null != defaultValue) {
     if (!("submit" !== type && "reset" !== type || void 0 !== value && null !== value))
@@ -18626,7 +18791,7 @@ function initInput(element, value, defaultValue, checked, defaultChecked, type, 
   checked = "function" !== typeof checked && "symbol" !== typeof checked && !!checked;
   element.checked = isHydrating2 ? element.checked : !!checked;
   element.defaultChecked = !!checked;
-  null != name && "function" !== typeof name && "symbol" !== typeof name && "boolean" !== typeof name && (element.name = name);
+  null != name2 && "function" !== typeof name2 && "symbol" !== typeof name2 && "boolean" !== typeof name2 && (element.name = name2);
 }
 function setDefaultValue(node, type, value) {
   "number" === type && getActiveElement(node.ownerDocument) === node || node.defaultValue === "" + value || (node.defaultValue = "" + value);
@@ -27222,7 +27387,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
     case "li":
       break;
     case "input":
-      var name = null, type = null, value = null, defaultValue = null, lastDefaultValue = null, checked = null, defaultChecked = null;
+      var name2 = null, type = null, value = null, defaultValue = null, lastDefaultValue = null, checked = null, defaultChecked = null;
       for (propKey in lastProps) {
         var lastProp = lastProps[propKey];
         if (lastProps.hasOwnProperty(propKey) && null != lastProp)
@@ -27246,7 +27411,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
               type = propKey;
               break;
             case "name":
-              name = propKey;
+              name2 = propKey;
               break;
             case "checked":
               checked = propKey;
@@ -27284,7 +27449,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
         checked,
         defaultChecked,
         type,
-        name
+        name2
       );
       return;
     case "select":
@@ -27306,9 +27471,9 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
                 lastDefaultValue
               );
           }
-      for (name in nextProps)
-        if (type = nextProps[name], lastDefaultValue = lastProps[name], nextProps.hasOwnProperty(name) && (null != type || null != lastDefaultValue))
-          switch (name) {
+      for (name2 in nextProps)
+        if (type = nextProps[name2], lastDefaultValue = lastProps[name2], nextProps.hasOwnProperty(name2) && (null != type || null != lastDefaultValue))
+          switch (name2) {
             case "value":
               propKey$205 = type;
               break;
@@ -27321,7 +27486,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
               type !== lastDefaultValue && setProp(
                 domElement,
                 tag,
-                name,
+                name2,
                 type,
                 nextProps,
                 lastDefaultValue
@@ -27335,31 +27500,31 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
     case "textarea":
       propKey = propKey$205 = null;
       for (defaultValue in lastProps)
-        if (name = lastProps[defaultValue], lastProps.hasOwnProperty(defaultValue) && null != name && !nextProps.hasOwnProperty(defaultValue))
+        if (name2 = lastProps[defaultValue], lastProps.hasOwnProperty(defaultValue) && null != name2 && !nextProps.hasOwnProperty(defaultValue))
           switch (defaultValue) {
             case "value":
               break;
             case "children":
               break;
             default:
-              setProp(domElement, tag, defaultValue, null, nextProps, name);
+              setProp(domElement, tag, defaultValue, null, nextProps, name2);
           }
       for (value in nextProps)
-        if (name = nextProps[value], type = lastProps[value], nextProps.hasOwnProperty(value) && (null != name || null != type))
+        if (name2 = nextProps[value], type = lastProps[value], nextProps.hasOwnProperty(value) && (null != name2 || null != type))
           switch (value) {
             case "value":
-              propKey$205 = name;
+              propKey$205 = name2;
               break;
             case "defaultValue":
-              propKey = name;
+              propKey = name2;
               break;
             case "children":
               break;
             case "dangerouslySetInnerHTML":
-              if (null != name) throw Error(formatProdErrorMessage(91));
+              if (null != name2) throw Error(formatProdErrorMessage(91));
               break;
             default:
-              name !== type && setProp(domElement, tag, value, name, nextProps, type);
+              name2 !== type && setProp(domElement, tag, value, name2, nextProps, type);
           }
       updateTextarea(domElement, propKey$205, propKey);
       return;
@@ -27574,8 +27739,8 @@ function canHydrateInstance(instance, type, props, inRootOrSingleton) {
         break;
     } else if (!inRootOrSingleton)
       if ("input" === type && "hidden" === instance.type) {
-        var name = null == anyProps.name ? null : "" + anyProps.name;
-        if ("hidden" === anyProps.type && instance.getAttribute("name") === name)
+        var name2 = null == anyProps.name ? null : "" + anyProps.name;
+        if ("hidden" === anyProps.type && instance.getAttribute("name") === name2)
           return instance;
       } else return instance;
     else if (!instance[internalHoistableMarker])
@@ -27584,18 +27749,18 @@ function canHydrateInstance(instance, type, props, inRootOrSingleton) {
           if (!instance.hasAttribute("itemprop")) break;
           return instance;
         case "link":
-          name = instance.getAttribute("rel");
-          if ("stylesheet" === name && instance.hasAttribute("data-precedence"))
+          name2 = instance.getAttribute("rel");
+          if ("stylesheet" === name2 && instance.hasAttribute("data-precedence"))
             break;
-          else if (name !== anyProps.rel || instance.getAttribute("href") !== (null == anyProps.href || "" === anyProps.href ? null : anyProps.href) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin) || instance.getAttribute("title") !== (null == anyProps.title ? null : anyProps.title))
+          else if (name2 !== anyProps.rel || instance.getAttribute("href") !== (null == anyProps.href || "" === anyProps.href ? null : anyProps.href) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin) || instance.getAttribute("title") !== (null == anyProps.title ? null : anyProps.title))
             break;
           return instance;
         case "style":
           if (instance.hasAttribute("data-precedence")) break;
           return instance;
         case "script":
-          name = instance.getAttribute("src");
-          if ((name !== (null == anyProps.src ? null : anyProps.src) || instance.getAttribute("type") !== (null == anyProps.type ? null : anyProps.type) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin)) && name && instance.hasAttribute("async") && !instance.hasAttribute("itemprop"))
+          name2 = instance.getAttribute("src");
+          if ((name2 !== (null == anyProps.src ? null : anyProps.src) || instance.getAttribute("type") !== (null == anyProps.type ? null : anyProps.type) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin)) && name2 && instance.hasAttribute("async") && !instance.hasAttribute("itemprop"))
             break;
           return instance;
         default:
@@ -29929,9 +30094,9 @@ function replaceEqualDeep(prev, _next) {
 function getEnumerableOwnKeys(o) {
   const keys2 = [];
   const names = Object.getOwnPropertyNames(o);
-  for (const name of names) {
-    if (!Object.prototype.propertyIsEnumerable.call(o, name)) return false;
-    keys2.push(name);
+  for (const name2 of names) {
+    if (!Object.prototype.propertyIsEnumerable.call(o, name2)) return false;
+    keys2.push(name2);
   }
   const symbols = Object.getOwnPropertySymbols(o);
   for (const symbol of symbols) {
@@ -39049,8 +39214,8 @@ function composeContextScopes(...scopes) {
   createScope.scopeName = baseScope.scopeName;
   return createScope;
 }
-function createCollection(name) {
-  const PROVIDER_NAME2 = name + "CollectionProvider";
+function createCollection(name2) {
+  const PROVIDER_NAME2 = name2 + "CollectionProvider";
   const [createCollectionContext, createCollectionScope2] = createContextScope(PROVIDER_NAME2);
   const [CollectionProviderImpl, useCollectionContext] = createCollectionContext(
     PROVIDER_NAME2,
@@ -39063,7 +39228,7 @@ function createCollection(name) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(CollectionProviderImpl, { scope, itemMap, collectionRef: ref, children });
   };
   CollectionProvider.displayName = PROVIDER_NAME2;
-  const COLLECTION_SLOT_NAME = name + "CollectionSlot";
+  const COLLECTION_SLOT_NAME = name2 + "CollectionSlot";
   const CollectionSlotImpl = /* @__PURE__ */ createSlot(COLLECTION_SLOT_NAME);
   const CollectionSlot = reactExports.forwardRef(
     (props, forwardedRef) => {
@@ -39074,7 +39239,7 @@ function createCollection(name) {
     }
   );
   CollectionSlot.displayName = COLLECTION_SLOT_NAME;
-  const ITEM_SLOT_NAME = name + "CollectionItemSlot";
+  const ITEM_SLOT_NAME = name2 + "CollectionItemSlot";
   const ITEM_DATA_ATTR = "data-radix-collection-item";
   const CollectionItemSlotImpl = /* @__PURE__ */ createSlot(ITEM_SLOT_NAME);
   const CollectionItemSlot = reactExports.forwardRef(
@@ -39092,7 +39257,7 @@ function createCollection(name) {
   );
   CollectionItemSlot.displayName = ITEM_SLOT_NAME;
   function useCollection2(scope) {
-    const context = useCollectionContext(name + "CollectionConsumer", scope);
+    const context = useCollectionContext(name2 + "CollectionConsumer", scope);
     const getItems = reactExports.useCallback(() => {
       const collectionNode = context.collectionRef.current;
       if (!collectionNode) return [];
@@ -39461,10 +39626,10 @@ function dispatchUpdate() {
   const event = new CustomEvent(CONTEXT_UPDATE);
   document.dispatchEvent(event);
 }
-function handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
+function handleAndDispatchCustomEvent(name2, handler, detail, { discrete }) {
   const target = detail.originalEvent.target;
-  const event = new CustomEvent(name, { bubbles: false, cancelable: true, detail });
-  if (handler) target.addEventListener(name, handler, { once: true });
+  const event = new CustomEvent(name2, { bubbles: false, cancelable: true, detail });
+  if (handler) target.addEventListener(name2, handler, { once: true });
   if (discrete) {
     dispatchDiscreteCustomEvent(target, event);
   } else {
@@ -39984,7 +40149,7 @@ const computePosition$1 = async (reference, floating, config2) => {
       continue;
     }
     const {
-      name,
+      name: name2,
       fn
     } = currentMiddleware;
     const {
@@ -40008,8 +40173,8 @@ const computePosition$1 = async (reference, floating, config2) => {
     });
     x3 = nextX != null ? nextX : x3;
     y2 = nextY != null ? nextY : y2;
-    middlewareData[name] = {
-      ...middlewareData[name],
+    middlewareData[name2] = {
+      ...middlewareData[name2],
       ...data
     };
     if (reset && resetCount < MAX_RESET_COUNT) {
@@ -42995,8 +43160,8 @@ function RemoveScrollSideCar(props) {
       }
     }
   }, []);
-  var shouldCancel = reactExports.useCallback(function(name, delta, target, should) {
-    var event = { name, delta, target, should, shadowParent: getOutermostShadowParent(target) };
+  var shouldCancel = reactExports.useCallback(function(name2, delta, target, should) {
+    var event = { name: name2, delta, target, should, shadowParent: getOutermostShadowParent(target) };
     shouldPreventQueue.current.push(event);
     setTimeout(function() {
       shouldPreventQueue.current = shouldPreventQueue.current.filter(function(e3) {
@@ -43080,7 +43245,7 @@ function SelectProvider(props) {
     defaultValue,
     onValueChange,
     dir,
-    name,
+    name: name2,
     autoComplete,
     disabled,
     required,
@@ -43136,7 +43301,7 @@ function SelectProvider(props) {
     dir: direction,
     triggerPointerDownPosRef,
     disabled,
-    name,
+    name: name2,
     autoComplete,
     form,
     nativeOptions: nativeOptionsSet,
@@ -44129,7 +44294,7 @@ var BUBBLE_INPUT_NAME = "SelectBubbleInput";
 var SelectBubbleInput = reactExports.forwardRef(
   ({ __scopeSelect, ...props }, forwardedRef) => {
     const context = useSelectContext(BUBBLE_INPUT_NAME, __scopeSelect);
-    const { value, onValueChange, required, disabled, name, autoComplete, form } = context;
+    const { value, onValueChange, required, disabled, name: name2, autoComplete, form } = context;
     const { nativeOptions, nativeSelectKey } = context;
     const ref = reactExports.useRef(null);
     const composedRefs = useComposedRefs(forwardedRef, ref);
@@ -44159,7 +44324,7 @@ var SelectBubbleInput = reactExports.forwardRef(
         "aria-hidden": true,
         required,
         tabIndex: -1,
-        name,
+        name: name2,
         autoComplete,
         disabled,
         form,
@@ -50394,8 +50559,8 @@ var symbolFactories = {
 };
 var RADIAN$1 = Math.PI / 180;
 var getSymbolFactory = function getSymbolFactory2(type) {
-  var name = "symbol".concat(upperFirst$1(type));
-  return symbolFactories[name] || symbolCircle;
+  var name2 = "symbol".concat(upperFirst$1(type));
+  return symbolFactories[name2] || symbolCircle;
 };
 var calculateAreaSize = function calculateAreaSize2(size2, sizeType, type) {
   if (sizeType === "area") {
@@ -52216,11 +52381,11 @@ var DefaultTooltipContent = function DefaultTooltipContent2(props) {
           color: entry.color || "#000"
         }, itemStyle);
         var finalFormatter = entry.formatter || formatter || defaultFormatter;
-        var value = entry.value, name = entry.name;
+        var value = entry.value, name2 = entry.name;
         var finalValue = value;
-        var finalName = name;
+        var finalName = name2;
         if (finalFormatter && finalValue != null && finalName != null) {
-          var formatted = finalFormatter(value, name, entry, i, payload);
+          var formatted = finalFormatter(value, name2, entry, i, payload);
           if (Array.isArray(formatted)) {
             var _formatted = _slicedToArray$b(formatted, 2);
             finalValue = _formatted[0];
@@ -56001,7 +56166,7 @@ function formatRe(names) {
   return new RegExp("^(?:" + names.map(requote).join("|") + ")", "i");
 }
 function formatLookup(names) {
-  return new Map(names.map((name, i) => [name.toLowerCase(), i]));
+  return new Map(names.map((name2, i) => [name2.toLowerCase(), i]));
 }
 function parseWeekdayNumberSunday(d2, string2, i) {
   var n2 = numberRe.exec(string2.slice(i, i + 1));
@@ -58184,13 +58349,13 @@ var getLegendProps = function getLegendProps2(_ref) {
       var item = _ref3.item;
       var itemDefaultProps = item.type.defaultProps;
       var itemProps = itemDefaultProps !== void 0 ? _objectSpread$r(_objectSpread$r({}, itemDefaultProps), item.props) : {};
-      var dataKey = itemProps.dataKey, name = itemProps.name, legendType = itemProps.legendType, hide2 = itemProps.hide;
+      var dataKey = itemProps.dataKey, name2 = itemProps.name, legendType = itemProps.legendType, hide2 = itemProps.hide;
       return {
         inactive: hide2,
         dataKey,
         type: legendProps.iconType || legendType || "square",
         color: getMainColorOfGraphicItem(item),
-        value: name || dataKey,
+        value: name2 || dataKey,
         // @ts-expect-error property strokeDasharray is required in Payload but optional in props
         payload: itemProps
       };
@@ -58727,10 +58892,10 @@ var parseScale = function parseScale2(axis, chartType, hasBar) {
     };
   }
   if (isString$1(scale)) {
-    var name = "scale".concat(upperFirst$1(scale));
+    var name2 = "scale".concat(upperFirst$1(scale));
     return {
-      scale: (d3Scales[name] || point)(),
-      realScaleType: d3Scales[name] ? name : "point"
+      scale: (d3Scales[name2] || point)(),
+      realScaleType: d3Scales[name2] ? name2 : "point"
     };
   }
   return isFunction$3(scale) ? {
@@ -59065,12 +59230,12 @@ var parseDomainOfCategoryAxis = function parseDomainOfCategoryAxis2(specifiedDom
 };
 var getTooltipItem = function getTooltipItem2(graphicalItem, payload) {
   var defaultedProps = graphicalItem.type.defaultProps ? _objectSpread$q(_objectSpread$q({}, graphicalItem.type.defaultProps), graphicalItem.props) : graphicalItem.props;
-  var dataKey = defaultedProps.dataKey, name = defaultedProps.name, unit2 = defaultedProps.unit, formatter = defaultedProps.formatter, tooltipType = defaultedProps.tooltipType, chartType = defaultedProps.chartType, hide2 = defaultedProps.hide;
+  var dataKey = defaultedProps.dataKey, name2 = defaultedProps.name, unit2 = defaultedProps.unit, formatter = defaultedProps.formatter, tooltipType = defaultedProps.tooltipType, chartType = defaultedProps.chartType, hide2 = defaultedProps.hide;
   return _objectSpread$q(_objectSpread$q({}, filterProps(graphicalItem, false)), {}, {
     dataKey,
     unit: unit2,
     formatter,
-    name: name || dataKey,
+    name: name2 || dataKey,
     color: getMainColorOfGraphicItem(graphicalItem),
     value: getValueByDataKey(payload, dataKey),
     type: tooltipType,
@@ -60245,11 +60410,11 @@ var getCurveFactory = function getCurveFactory2(type, layout) {
   if (isFunction$3(type)) {
     return type;
   }
-  var name = "curve".concat(upperFirst$1(type));
-  if ((name === "curveMonotone" || name === "curveBump") && layout) {
-    return CURVE_FACTORIES["".concat(name).concat(layout === "vertical" ? "Y" : "X")];
+  var name2 = "curve".concat(upperFirst$1(type));
+  if ((name2 === "curveMonotone" || name2 === "curveBump") && layout) {
+    return CURVE_FACTORIES["".concat(name2).concat(layout === "vertical" ? "Y" : "X")];
   }
-  return CURVE_FACTORIES[name] || curveLinear;
+  return CURVE_FACTORIES[name2] || curveLinear;
 };
 var getPath$1 = function getPath(_ref) {
   var _ref$type = _ref.type, type = _ref$type === void 0 ? "linear" : _ref$type, _ref$points = _ref.points, points = _ref$points === void 0 ? [] : _ref$points, baseLine = _ref.baseLine, layout = _ref.layout, _ref$connectNulls = _ref.connectNulls, connectNulls = _ref$connectNulls === void 0 ? false : _ref$connectNulls;
@@ -60956,8 +61121,8 @@ var getIntersectionKeys = function getIntersectionKeys2(preObj, nextObj) {
 var identity2 = function identity22(param) {
   return param;
 };
-var getDashCase = function getDashCase2(name) {
-  return name.replace(/([A-Z])/g, function(v2) {
+var getDashCase = function getDashCase2(name2) {
+  return name2.replace(/([A-Z])/g, function(v2) {
     return "-".concat(v2.toLowerCase());
   });
 };
@@ -62743,14 +62908,14 @@ function _toPrimitive$g(t2, r2) {
   return ("string" === r2 ? String : Number)(t2);
 }
 var PREFIX_LIST = ["Webkit", "Moz", "O", "ms"];
-var generatePrefixStyle = function generatePrefixStyle2(name, value) {
-  var camelName = name.replace(/(\w)/, function(v2) {
+var generatePrefixStyle = function generatePrefixStyle2(name2, value) {
+  var camelName = name2.replace(/(\w)/, function(v2) {
     return v2.toUpperCase();
   });
   var result = PREFIX_LIST.reduce(function(res, entry) {
     return _objectSpread$d(_objectSpread$d({}, res), {}, _defineProperty$g({}, entry + camelName, value));
   }, {});
-  result[name] = value;
+  result[name2] = value;
   return result;
 };
 function _typeof$f(o) {
@@ -67329,10 +67494,10 @@ var eventemitter3 = { exports: {} };
     this._eventsCount = 0;
   }
   EventEmitter2.prototype.eventNames = function eventNames() {
-    var names = [], events2, name;
+    var names = [], events2, name2;
     if (this._eventsCount === 0) return names;
-    for (name in events2 = this._events) {
-      if (has.call(events2, name)) names.push(prefix2 ? name.slice(1) : name);
+    for (name2 in events2 = this._events) {
+      if (has.call(events2, name2)) names.push(prefix2 ? name2.slice(1) : name2);
     }
     if (Object.getOwnPropertySymbols) {
       return names.concat(Object.getOwnPropertySymbols(events2));
@@ -68312,8 +68477,8 @@ var hasGraphicalBarItem = function hasGraphicalBarItem2(graphicalItems) {
     return false;
   }
   return graphicalItems.some(function(item) {
-    var name = getDisplayName(item && item.type);
-    return name && name.indexOf("Bar") >= 0;
+    var name2 = getDisplayName(item && item.type);
+    return name2 && name2.indexOf("Bar") >= 0;
   });
 };
 var getAxisNameByLayout = function getAxisNameByLayout2(layout) {
@@ -68490,8 +68655,8 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
     var graphicalItems = findAllByType(children, GraphicalChild);
     var stackGroups = getStackGroupsByAxisId(data, graphicalItems, "".concat(numericAxisName, "Id"), "".concat(cateAxisName, "Id"), stackOffset, reverseStackOrder);
     var axisObj = axisComponents.reduce(function(result, entry) {
-      var name = "".concat(entry.axisType, "Map");
-      return _objectSpread(_objectSpread({}, result), {}, _defineProperty({}, name, getAxisMap(props, _objectSpread(_objectSpread({}, entry), {}, {
+      var name2 = "".concat(entry.axisType, "Map");
+      return _objectSpread(_objectSpread({}, result), {}, _defineProperty({}, name2, getAxisMap(props, _objectSpread(_objectSpread({}, entry), {}, {
         graphicalItems,
         stackGroups: entry.axisType === numericAxisName && stackGroups,
         dataStartIndex,
@@ -70372,5 +70537,8 @@ BigInt.prototype.toJSON = function() {
 };
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(InternetIdentityProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) }) })
+  /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(InternetIdentityProvider, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Analytics, {})
+  ] }) })
 );

@@ -5,7 +5,6 @@ import {
   createRoute,
   createRouter,
 } from "@tanstack/react-router";
-import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import TimetableApp from "./components/TimetableApp";
 import { AnalyticsProvider } from "./hooks/useAnalytics";
@@ -77,12 +76,7 @@ declare module "@tanstack/react-router" {
 }
 
 function App() {
-  return (
-    <>
-      <RouterProvider router={router} />
-      <Analytics />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
