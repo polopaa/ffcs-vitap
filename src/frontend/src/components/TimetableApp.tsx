@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
+import type { CoursesData } from "@/types/timetable";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import type { CoursesData } from "../App";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { detectClashes, getClashSummary } from "../lib/clashDetection";
 import CourseModal from "./CourseModal";

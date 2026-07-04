@@ -3291,8 +3291,8 @@ field ${k2} -> ${e3.message}`, {
           x3[expectKey] = [];
           expectedRecordIdx++;
         } else {
-          const expectedFields = this._fields.map(([name2]) => name2).join(", ");
-          const receivedFields = record._fields.map(([name2]) => name2).join(", ");
+          const expectedFields = this._fields.map(([name]) => name).join(", ");
+          const receivedFields = record._fields.map(([name]) => name).join(", ");
           throw new CandidDecodeError(`Cannot find required field '${expectKey}' in record, expected fields: [${expectedFields}], received fields: [${receivedFields}]`);
         }
       } else {
@@ -3304,8 +3304,8 @@ field ${k2} -> ${e3.message}`, {
       if (expectType instanceof OptClass || expectType instanceof ReservedClass) {
         x3[expectKey] = [];
       } else {
-        const expectedFields = this._fields.map(([name2]) => name2).join(", ");
-        const receivedFields = record._fields.map(([name2]) => name2).join(", ");
+        const expectedFields = this._fields.map(([name]) => name).join(", ");
+        const receivedFields = record._fields.map(([name]) => name).join(", ");
         throw new CandidDecodeError(`Cannot find required field '${expectKey}' in record, expected fields: [${expectedFields}], received fields: [${receivedFields}]`);
       }
     }
@@ -3313,8 +3313,8 @@ field ${k2} -> ${e3.message}`, {
   }
   get fieldsAsObject() {
     const fields = {};
-    for (const [name2, ty] of this._fields) {
-      fields[idlLabelToId(name2)] = ty;
+    for (const [name, ty] of this._fields) {
+      fields[idlLabelToId(name)] = ty;
     }
     return fields;
   }
@@ -3427,10 +3427,10 @@ variant ${k2} -> ${e3.message}`, {
   }
   encodeValue(x3) {
     for (let i = 0; i < this._fields.length; i++) {
-      const [name2, type] = this._fields[i];
-      if (x3.hasOwnProperty(name2)) {
+      const [name, type] = this._fields[i];
+      if (x3.hasOwnProperty(name)) {
         const idx = lebEncode(i);
-        const buf = type.encodeValue(x3[name2]);
+        const buf = type.encodeValue(x3[name]);
         return concat(idx, buf);
       }
     }
@@ -3461,7 +3461,7 @@ variant ${k2} -> ${e3.message}`, {
         return { [key]: value };
       }
     }
-    const expectedFields = this._fields.map(([name2]) => name2).join(", ");
+    const expectedFields = this._fields.map(([name]) => name).join(", ");
     throw new CandidDecodeError(`Cannot find field hash ${wireHash} in variant, expected fields: [${expectedFields}]`);
   }
   get name() {
@@ -3473,21 +3473,21 @@ variant ${k2} -> ${e3.message}`, {
     return `variant {${fields.join("; ")}}`;
   }
   valueToString(x3) {
-    for (const [name2, type] of this._fields) {
-      if (x3.hasOwnProperty(name2)) {
-        const value = type.valueToString(x3[name2]);
+    for (const [name, type] of this._fields) {
+      if (x3.hasOwnProperty(name)) {
+        const value = type.valueToString(x3[name]);
         if (value === "null") {
-          return `variant {${name2}}`;
+          return `variant {${name}}`;
         }
-        return `variant {${name2}=${value}}`;
+        return `variant {${name}=${value}}`;
       }
     }
     throw new Error(`Variant has no data: ${x3}`);
   }
   get alternativesAsObject() {
     const alternatives = {};
-    for (const [name2, ty] of this._fields) {
-      alternatives[idlLabelToId(name2)] = ty;
+    for (const [name, ty] of this._fields) {
+      alternatives[idlLabelToId(name)] = ty;
     }
     return alternatives;
   }
@@ -3754,8 +3754,8 @@ class ServiceClass extends ConstructType {
   }
   fieldsAsObject() {
     const fields = {};
-    for (const [name2, ty] of this._fields) {
-      fields[name2] = ty;
+    for (const [name, ty] of this._fields) {
+      fields[name] = ty;
     }
     return fields;
   }
@@ -3955,8 +3955,8 @@ function decode$2(retTypes, bytes) {
       case IDLTypeIds.Record: {
         const fields = {};
         for (const [hash, ty] of entry[1]) {
-          const name2 = `_${hash}_`;
-          fields[name2] = getType(ty);
+          const name = `_${hash}_`;
+          fields[name] = getType(ty);
         }
         const record = Record(fields);
         const tuple = record.tryAsTuple();
@@ -3968,8 +3968,8 @@ function decode$2(retTypes, bytes) {
       case IDLTypeIds.Variant: {
         const fields = {};
         for (const [hash, ty] of entry[1]) {
-          const name2 = `_${hash}_`;
-          fields[name2] = getType(ty);
+          const name = `_${hash}_`;
+          fields[name] = getType(ty);
         }
         return Variant(fields);
       }
@@ -3980,7 +3980,7 @@ function decode$2(retTypes, bytes) {
       case IDLTypeIds.Service: {
         const rec = {};
         const methods = entry[1];
-        for (const [name2, typeRef] of methods) {
+        for (const [name, typeRef] of methods) {
           let type = getType(typeRef);
           if (type instanceof RecClass) {
             type = type.getType();
@@ -3988,7 +3988,7 @@ function decode$2(retTypes, bytes) {
           if (!(type instanceof FuncClass)) {
             throw new Error("Illegal service definition: services can only contain functions");
           }
-          rec[name2] = type;
+          rec[name] = type;
         }
         return Service(rec);
       }
@@ -4229,8 +4229,8 @@ function subtype_(relations, t12, t2) {
   }
   if (t12 instanceof ServiceClass && t2 instanceof ServiceClass) {
     const t1Object = t12.fieldsAsObject();
-    for (const [name2, ty2] of t2._fields) {
-      const ty1 = t1Object[name2];
+    for (const [name, ty2] of t2._fields) {
+      const ty1 = t1Object[name];
       if (!ty1) {
         return false;
       }
@@ -9448,10 +9448,10 @@ openDb_fn = async function() {
   db.close();
   return __privateMethod(this, _IndexedDBExpirableStore_instances, openRequest_fn).call(this, nextVersion);
 };
-openRequest_fn = function(version2) {
+openRequest_fn = function(version) {
   const storeName = __privateGet(this, _storeName);
   return new Promise((resolve, reject) => {
-    const request2 = globalThis.indexedDB.open(__privateGet(this, _dbName), version2);
+    const request2 = globalThis.indexedDB.open(__privateGet(this, _dbName), version);
     request2.onupgradeneeded = () => {
       const db = request2.result;
       if (!db.objectStoreNames.contains(storeName)) {
@@ -10147,8 +10147,8 @@ const _HttpAgent = class _HttpAgent {
     });
     __privateSet(this, _backoffStrategy, options.backoffStrategy || defaultBackoffFactory);
     if (options.credentials) {
-      const { name: name2, password } = options.credentials;
-      __privateSet(this, _credentials, `${name2}${password ? `:${password}` : ""}`);
+      const { name, password } = options.credentials;
+      __privateSet(this, _credentials, `${name}${password ? `:${password}` : ""}`);
     }
     __privateSet(this, _identity, Promise.resolve(options.identity || new AnonymousIdentity()));
     if (options.ingressExpiryInMinutes && options.ingressExpiryInMinutes > 5) {
@@ -11678,7 +11678,7 @@ class StorageClient {
     return chunks;
   }
 }
-var define_process_env_default$2 = {};
+var define_process_env_default$1 = {};
 const DEFAULT_STORAGE_GATEWAY_URL = "https://blob.caffeine.ai";
 const DEFAULT_BUCKET_NAME = "default-bucket";
 const DEFAULT_PROJECT_ID = "0000000-0000-0000-0000-00000000000";
@@ -11687,8 +11687,8 @@ async function loadConfig() {
   if (configCache) {
     return configCache;
   }
-  const backendCanisterId = define_process_env_default$2.CANISTER_ID_BACKEND;
-  const envBaseUrl = define_process_env_default$2.BASE_URL || "/";
+  const backendCanisterId = define_process_env_default$1.CANISTER_ID_BACKEND;
+  const envBaseUrl = define_process_env_default$1.BASE_URL || "/";
   const baseUrl = envBaseUrl.endsWith("/") ? envBaseUrl : `${envBaseUrl}/`;
   try {
     const response = await fetch(`${baseUrl}env.json`);
@@ -15818,12 +15818,12 @@ class Signer {
         }
         return standards.map((item) => {
           const obj = asRecord(item);
-          const name2 = asString(obj == null ? void 0 : obj.name);
+          const name = asString(obj == null ? void 0 : obj.name);
           const url = asString(obj == null ? void 0 : obj.url);
-          if (name2 === void 0 || url === void 0) {
+          if (name === void 0 || url === void 0) {
             throw new Error("Expected { name, url }");
           }
-          return { name: name2, url };
+          return { name, url };
         });
       }
     });
@@ -16347,8 +16347,8 @@ const _IdleManager = class _IdleManager {
     __privateSet(this, _idleTimeout, idleTimeout);
     __privateSet(this, _resetTimer, this._resetTimer.bind(this));
     window.addEventListener("load", __privateGet(this, _resetTimer), true);
-    events.forEach((name2) => {
-      document.addEventListener(name2, __privateGet(this, _resetTimer), true);
+    events.forEach((name) => {
+      document.addEventListener(name, __privateGet(this, _resetTimer), true);
     });
     const debounce2 = (func, wait) => {
       let timeout2;
@@ -16402,8 +16402,8 @@ const _IdleManager = class _IdleManager {
   exit() {
     clearTimeout(__privateGet(this, _timeoutID));
     window.removeEventListener("load", __privateGet(this, _resetTimer), true);
-    events.forEach((name2) => {
-      document.removeEventListener(name2, __privateGet(this, _resetTimer), true);
+    events.forEach((name) => {
+      document.removeEventListener(name, __privateGet(this, _resetTimer), true);
     });
     __privateGet(this, _callbacks).forEach((cb) => {
       cb();
@@ -16567,8 +16567,8 @@ function wrap(value) {
   return newValue;
 }
 const unwrap = (value) => reverseTransformCache.get(value);
-function openDB(name2, version2, { blocked, upgrade, blocking, terminated } = {}) {
-  const request2 = indexedDB.open(name2, version2);
+function openDB(name, version, { blocked, upgrade, blocking, terminated } = {}) {
+  const request2 = indexedDB.open(name, version);
   const openPromise = wrap(request2);
   if (upgrade) {
     request2.addEventListener("upgradeneeded", (event) => {
@@ -16631,13 +16631,13 @@ replaceTraps((oldTraps) => ({
 }));
 const AUTH_DB_NAME = "auth-client-db";
 const OBJECT_STORE_NAME = "ic-keyval";
-const _openDbStore = async (dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version2) => {
+const _openDbStore = async (dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version) => {
   var _a2;
   if ((_a2 = globalThis.localStorage) == null ? void 0 : _a2.getItem(KEY_STORAGE_DELEGATION)) {
     globalThis.localStorage.removeItem(KEY_STORAGE_DELEGATION);
     globalThis.localStorage.removeItem(KEY_STORAGE_KEY);
   }
-  return await openDB(dbName, version2, {
+  return await openDB(dbName, version, {
     upgrade: (database) => {
       if (database.objectStoreNames.contains(storeName)) {
         database.clear(storeName);
@@ -16672,8 +16672,8 @@ class IdbKeyVal {
    * @param {DBCreateOptions['version']} options.version version of the database. Increment to safely upgrade
    */
   static async create(options) {
-    const { dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version: version2 = DB_VERSION } = options ?? {};
-    const db = await _openDbStore(dbName, storeName, version2);
+    const { dbName = AUTH_DB_NAME, storeName = OBJECT_STORE_NAME, version = DB_VERSION } = options ?? {};
+    const db = await _openDbStore(dbName, storeName, version);
     return new IdbKeyVal(db, storeName);
   }
   /**
@@ -17108,14 +17108,14 @@ async function migrateFromLocalStorage(storage, keyType) {
     return null;
   }
 }
-var define_process_env_default$1 = {};
+var define_process_env_default = {};
 const iiAttributesIDL = ({ IDL: I2 }) => I2.Service({
   _internet_identity_sign_in_start: I2.Func([], [I2.Vec(I2.Nat8)], []),
   _internet_identity_sign_in_finish: I2.Func([], [I2.Variant({ ok: I2.Null, err: I2.Record({}) })], []),
   _initialize_access_control: I2.Func([], [], [])
 });
 const II_MAINNET_CANISTER_ID = "rdmx6-jaaaa-aaaaa-aaadq-cai";
-const II_SIGNER_CANISTER_ID = define_process_env_default$1.II_CANISTER_ID ?? II_MAINNET_CANISTER_ID;
+const II_SIGNER_CANISTER_ID = define_process_env_default.II_CANISTER_ID ?? II_MAINNET_CANISTER_ID;
 const ONE_HOUR_IN_NANOSECONDS = BigInt(36e11);
 const DEFAULT_IDENTITY_PROVIDER = "https://id.ai/authorize";
 const DEFAULT_ATTRIBUTE_KEYS = ["verified_email"];
@@ -17345,171 +17345,6 @@ function useActor(createActor2) {
     actor: actorQuery.data || null,
     isFetching: actorQuery.isFetching
   };
-}
-var define_process_env_default = {};
-var initQueue = () => {
-  if (window.va) return;
-  window.va = function a2(...params) {
-    if (!window.vaq) window.vaq = [];
-    window.vaq.push(params);
-  };
-};
-var name = "@vercel/analytics";
-var version = "2.0.1";
-function isBrowser() {
-  return typeof window !== "undefined";
-}
-function detectEnvironment() {
-  try {
-    const env = "production";
-    if (env === "development" || env === "test") ;
-  } catch {
-  }
-  return "production";
-}
-function setMode(mode = "auto") {
-  if (mode === "auto") {
-    window.vam = detectEnvironment();
-    return;
-  }
-  window.vam = mode;
-}
-function getMode() {
-  const mode = isBrowser() ? window.vam : detectEnvironment();
-  return mode || "production";
-}
-function isDevelopment() {
-  return getMode() === "development";
-}
-function getScriptSrc(props) {
-  if (props.scriptSrc) {
-    return makeAbsolute(props.scriptSrc);
-  }
-  if (isDevelopment()) {
-    return "https://va.vercel-scripts.com/v1/script.debug.js";
-  }
-  if (props.basePath) {
-    return makeAbsolute(`${props.basePath}/insights/script.js`);
-  }
-  return "/_vercel/insights/script.js";
-}
-function loadProps(explicitProps, confString) {
-  var _a2;
-  let props = explicitProps;
-  if (confString) {
-    try {
-      props = {
-        ...(_a2 = JSON.parse(confString)) == null ? void 0 : _a2.analytics,
-        ...explicitProps
-      };
-    } catch {
-    }
-  }
-  setMode(props.mode);
-  const dataset = {
-    sdkn: name + (props.framework ? `/${props.framework}` : ""),
-    sdkv: version
-  };
-  if (props.disableAutoTrack) {
-    dataset.disableAutoTrack = "1";
-  }
-  if (props.viewEndpoint) {
-    dataset.viewEndpoint = makeAbsolute(props.viewEndpoint);
-  }
-  if (props.eventEndpoint) {
-    dataset.eventEndpoint = makeAbsolute(props.eventEndpoint);
-  }
-  if (props.sessionEndpoint) {
-    dataset.sessionEndpoint = makeAbsolute(props.sessionEndpoint);
-  }
-  if (isDevelopment() && props.debug === false) {
-    dataset.debug = "false";
-  }
-  if (props.dsn) {
-    dataset.dsn = props.dsn;
-  }
-  if (props.endpoint) {
-    dataset.endpoint = props.endpoint;
-  } else if (props.basePath) {
-    dataset.endpoint = makeAbsolute(`${props.basePath}/insights`);
-  }
-  return {
-    beforeSend: props.beforeSend,
-    src: getScriptSrc(props),
-    dataset
-  };
-}
-function makeAbsolute(url) {
-  return url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/") ? url : `/${url}`;
-}
-function inject(props = {
-  debug: true
-}, confString) {
-  var _a2;
-  if (!isBrowser()) return;
-  const { beforeSend, src, dataset } = loadProps(props, confString);
-  initQueue();
-  if (beforeSend) {
-    (_a2 = window.va) == null ? void 0 : _a2.call(window, "beforeSend", beforeSend);
-  }
-  if (document.head.querySelector(`script[src*="${src}"]`)) return;
-  const script = document.createElement("script");
-  script.src = src;
-  for (const [key, value] of Object.entries(dataset)) {
-    script.dataset[key] = value;
-  }
-  script.defer = true;
-  script.onerror = () => {
-    const errorMessage = isDevelopment() ? "Please check if any ad blockers are enabled and try again." : "Be sure to enable Web Analytics for your project and deploy again. See https://vercel.com/docs/analytics/quickstart for more information.";
-    console.log(
-      `[Vercel Web Analytics] Failed to load script from ${src}. ${errorMessage}`
-    );
-  };
-  document.head.appendChild(script);
-}
-function pageview({
-  route,
-  path
-}) {
-  var _a2;
-  (_a2 = window.va) == null ? void 0 : _a2.call(window, "pageview", { route, path });
-}
-function getBasePath() {
-  if (typeof process === "undefined" || typeof define_process_env_default === "undefined") {
-    return void 0;
-  }
-  return define_process_env_default.REACT_APP_VERCEL_OBSERVABILITY_BASEPATH;
-}
-function getConfigString() {
-  if (typeof process === "undefined" || typeof define_process_env_default === "undefined") {
-    return void 0;
-  }
-  return define_process_env_default.REACT_APP_VERCEL_OBSERVABILITY_CLIENT_CONFIG;
-}
-function Analytics(props) {
-  reactExports.useEffect(() => {
-    var _a2;
-    if (props.beforeSend) {
-      (_a2 = window.va) == null ? void 0 : _a2.call(window, "beforeSend", props.beforeSend);
-    }
-  }, [props.beforeSend]);
-  reactExports.useEffect(() => {
-    inject(
-      {
-        framework: props.framework || "react",
-        basePath: props.basePath ?? getBasePath(),
-        ...props.route !== void 0 && { disableAutoTrack: true },
-        ...props
-      },
-      props.configString ?? getConfigString()
-    );
-  }, []);
-  reactExports.useEffect(() => {
-    if (props.route && props.path) {
-      pageview({ route: props.route, path: props.path });
-    }
-  }, [props.route, props.path]);
-  return null;
 }
 var client = { exports: {} };
 var reactDomClient_production = {};
@@ -18491,56 +18326,56 @@ function isAttributeNameSafe(attributeName) {
   illegalAttributeNameCache[attributeName] = true;
   return false;
 }
-function setValueForAttribute(node, name2, value) {
-  if (isAttributeNameSafe(name2))
-    if (null === value) node.removeAttribute(name2);
+function setValueForAttribute(node, name, value) {
+  if (isAttributeNameSafe(name))
+    if (null === value) node.removeAttribute(name);
     else {
       switch (typeof value) {
         case "undefined":
         case "function":
         case "symbol":
-          node.removeAttribute(name2);
+          node.removeAttribute(name);
           return;
         case "boolean":
-          var prefix$8 = name2.toLowerCase().slice(0, 5);
+          var prefix$8 = name.toLowerCase().slice(0, 5);
           if ("data-" !== prefix$8 && "aria-" !== prefix$8) {
-            node.removeAttribute(name2);
+            node.removeAttribute(name);
             return;
           }
       }
-      node.setAttribute(name2, "" + value);
+      node.setAttribute(name, "" + value);
     }
 }
-function setValueForKnownAttribute(node, name2, value) {
-  if (null === value) node.removeAttribute(name2);
+function setValueForKnownAttribute(node, name, value) {
+  if (null === value) node.removeAttribute(name);
   else {
     switch (typeof value) {
       case "undefined":
       case "function":
       case "symbol":
       case "boolean":
-        node.removeAttribute(name2);
+        node.removeAttribute(name);
         return;
     }
-    node.setAttribute(name2, "" + value);
+    node.setAttribute(name, "" + value);
   }
 }
-function setValueForNamespacedAttribute(node, namespace, name2, value) {
-  if (null === value) node.removeAttribute(name2);
+function setValueForNamespacedAttribute(node, namespace, name, value) {
+  if (null === value) node.removeAttribute(name);
   else {
     switch (typeof value) {
       case "undefined":
       case "function":
       case "symbol":
       case "boolean":
-        node.removeAttribute(name2);
+        node.removeAttribute(name);
         return;
     }
-    node.setAttributeNS(namespace, name2, "" + value);
+    node.setAttributeNS(namespace, name, "" + value);
   }
 }
 var prefix$1, suffix;
-function describeBuiltInComponentFrame(name2) {
+function describeBuiltInComponentFrame(name) {
   if (void 0 === prefix$1)
     try {
       throw Error();
@@ -18549,7 +18384,7 @@ function describeBuiltInComponentFrame(name2) {
       prefix$1 = match && match[1] || "";
       suffix = -1 < x3.stack.indexOf("\n    at") ? " (<anonymous>)" : -1 < x3.stack.indexOf("@") ? "@unknown:0:0" : "";
     }
-  return "\n" + prefix$1 + name2 + suffix;
+  return "\n" + prefix$1 + name + suffix;
 }
 var reentry = false;
 function describeNativeComponentFrame(fn, construct) {
@@ -18761,7 +18596,7 @@ function escapeSelectorAttributeValueInsideDoubleQuotes(value) {
     }
   );
 }
-function updateInput(element, value, defaultValue, lastDefaultValue, checked, defaultChecked, type, name2) {
+function updateInput(element, value, defaultValue, lastDefaultValue, checked, defaultChecked, type, name) {
   element.name = "";
   null != type && "function" !== typeof type && "symbol" !== typeof type && "boolean" !== typeof type ? element.type = type : element.removeAttribute("type");
   if (null != value)
@@ -18775,9 +18610,9 @@ function updateInput(element, value, defaultValue, lastDefaultValue, checked, de
   null != value ? setDefaultValue(element, type, getToStringValue(value)) : null != defaultValue ? setDefaultValue(element, type, getToStringValue(defaultValue)) : null != lastDefaultValue && element.removeAttribute("value");
   null == checked && null != defaultChecked && (element.defaultChecked = !!defaultChecked);
   null != checked && (element.checked = checked && "function" !== typeof checked && "symbol" !== typeof checked);
-  null != name2 && "function" !== typeof name2 && "symbol" !== typeof name2 && "boolean" !== typeof name2 ? element.name = "" + getToStringValue(name2) : element.removeAttribute("name");
+  null != name && "function" !== typeof name && "symbol" !== typeof name && "boolean" !== typeof name ? element.name = "" + getToStringValue(name) : element.removeAttribute("name");
 }
-function initInput(element, value, defaultValue, checked, defaultChecked, type, name2, isHydrating2) {
+function initInput(element, value, defaultValue, checked, defaultChecked, type, name, isHydrating2) {
   null != type && "function" !== typeof type && "symbol" !== typeof type && "boolean" !== typeof type && (element.type = type);
   if (null != value || null != defaultValue) {
     if (!("submit" !== type && "reset" !== type || void 0 !== value && null !== value))
@@ -18791,7 +18626,7 @@ function initInput(element, value, defaultValue, checked, defaultChecked, type, 
   checked = "function" !== typeof checked && "symbol" !== typeof checked && !!checked;
   element.checked = isHydrating2 ? element.checked : !!checked;
   element.defaultChecked = !!checked;
-  null != name2 && "function" !== typeof name2 && "symbol" !== typeof name2 && "boolean" !== typeof name2 && (element.name = name2);
+  null != name && "function" !== typeof name && "symbol" !== typeof name && "boolean" !== typeof name && (element.name = name);
 }
 function setDefaultValue(node, type, value) {
   "number" === type && getActiveElement(node.ownerDocument) === node || node.defaultValue === "" + value || (node.defaultValue = "" + value);
@@ -27387,7 +27222,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
     case "li":
       break;
     case "input":
-      var name2 = null, type = null, value = null, defaultValue = null, lastDefaultValue = null, checked = null, defaultChecked = null;
+      var name = null, type = null, value = null, defaultValue = null, lastDefaultValue = null, checked = null, defaultChecked = null;
       for (propKey in lastProps) {
         var lastProp = lastProps[propKey];
         if (lastProps.hasOwnProperty(propKey) && null != lastProp)
@@ -27411,7 +27246,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
               type = propKey;
               break;
             case "name":
-              name2 = propKey;
+              name = propKey;
               break;
             case "checked":
               checked = propKey;
@@ -27449,7 +27284,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
         checked,
         defaultChecked,
         type,
-        name2
+        name
       );
       return;
     case "select":
@@ -27471,9 +27306,9 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
                 lastDefaultValue
               );
           }
-      for (name2 in nextProps)
-        if (type = nextProps[name2], lastDefaultValue = lastProps[name2], nextProps.hasOwnProperty(name2) && (null != type || null != lastDefaultValue))
-          switch (name2) {
+      for (name in nextProps)
+        if (type = nextProps[name], lastDefaultValue = lastProps[name], nextProps.hasOwnProperty(name) && (null != type || null != lastDefaultValue))
+          switch (name) {
             case "value":
               propKey$205 = type;
               break;
@@ -27486,7 +27321,7 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
               type !== lastDefaultValue && setProp(
                 domElement,
                 tag,
-                name2,
+                name,
                 type,
                 nextProps,
                 lastDefaultValue
@@ -27500,31 +27335,31 @@ function updateProperties(domElement, tag, lastProps, nextProps) {
     case "textarea":
       propKey = propKey$205 = null;
       for (defaultValue in lastProps)
-        if (name2 = lastProps[defaultValue], lastProps.hasOwnProperty(defaultValue) && null != name2 && !nextProps.hasOwnProperty(defaultValue))
+        if (name = lastProps[defaultValue], lastProps.hasOwnProperty(defaultValue) && null != name && !nextProps.hasOwnProperty(defaultValue))
           switch (defaultValue) {
             case "value":
               break;
             case "children":
               break;
             default:
-              setProp(domElement, tag, defaultValue, null, nextProps, name2);
+              setProp(domElement, tag, defaultValue, null, nextProps, name);
           }
       for (value in nextProps)
-        if (name2 = nextProps[value], type = lastProps[value], nextProps.hasOwnProperty(value) && (null != name2 || null != type))
+        if (name = nextProps[value], type = lastProps[value], nextProps.hasOwnProperty(value) && (null != name || null != type))
           switch (value) {
             case "value":
-              propKey$205 = name2;
+              propKey$205 = name;
               break;
             case "defaultValue":
-              propKey = name2;
+              propKey = name;
               break;
             case "children":
               break;
             case "dangerouslySetInnerHTML":
-              if (null != name2) throw Error(formatProdErrorMessage(91));
+              if (null != name) throw Error(formatProdErrorMessage(91));
               break;
             default:
-              name2 !== type && setProp(domElement, tag, value, name2, nextProps, type);
+              name !== type && setProp(domElement, tag, value, name, nextProps, type);
           }
       updateTextarea(domElement, propKey$205, propKey);
       return;
@@ -27739,8 +27574,8 @@ function canHydrateInstance(instance, type, props, inRootOrSingleton) {
         break;
     } else if (!inRootOrSingleton)
       if ("input" === type && "hidden" === instance.type) {
-        var name2 = null == anyProps.name ? null : "" + anyProps.name;
-        if ("hidden" === anyProps.type && instance.getAttribute("name") === name2)
+        var name = null == anyProps.name ? null : "" + anyProps.name;
+        if ("hidden" === anyProps.type && instance.getAttribute("name") === name)
           return instance;
       } else return instance;
     else if (!instance[internalHoistableMarker])
@@ -27749,18 +27584,18 @@ function canHydrateInstance(instance, type, props, inRootOrSingleton) {
           if (!instance.hasAttribute("itemprop")) break;
           return instance;
         case "link":
-          name2 = instance.getAttribute("rel");
-          if ("stylesheet" === name2 && instance.hasAttribute("data-precedence"))
+          name = instance.getAttribute("rel");
+          if ("stylesheet" === name && instance.hasAttribute("data-precedence"))
             break;
-          else if (name2 !== anyProps.rel || instance.getAttribute("href") !== (null == anyProps.href || "" === anyProps.href ? null : anyProps.href) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin) || instance.getAttribute("title") !== (null == anyProps.title ? null : anyProps.title))
+          else if (name !== anyProps.rel || instance.getAttribute("href") !== (null == anyProps.href || "" === anyProps.href ? null : anyProps.href) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin) || instance.getAttribute("title") !== (null == anyProps.title ? null : anyProps.title))
             break;
           return instance;
         case "style":
           if (instance.hasAttribute("data-precedence")) break;
           return instance;
         case "script":
-          name2 = instance.getAttribute("src");
-          if ((name2 !== (null == anyProps.src ? null : anyProps.src) || instance.getAttribute("type") !== (null == anyProps.type ? null : anyProps.type) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin)) && name2 && instance.hasAttribute("async") && !instance.hasAttribute("itemprop"))
+          name = instance.getAttribute("src");
+          if ((name !== (null == anyProps.src ? null : anyProps.src) || instance.getAttribute("type") !== (null == anyProps.type ? null : anyProps.type) || instance.getAttribute("crossorigin") !== (null == anyProps.crossOrigin ? null : anyProps.crossOrigin)) && name && instance.hasAttribute("async") && !instance.hasAttribute("itemprop"))
             break;
           return instance;
         default:
@@ -29392,6 +29227,1033 @@ const Toaster = ({ ...props }) => {
     }
   );
 };
+const Time = Int;
+const AnalyticsEventType$1 = Variant({
+  "clashDetected": Null,
+  "sessionStart": Null,
+  "courseRemoved": Null,
+  "courseCreated": Null,
+  "slotSelected": Null,
+  "reset": Null
+});
+const AnalyticsEvent = Record({
+  "courseCount": Nat,
+  "duration": Nat,
+  "clashCount": Nat,
+  "slotCount": Nat,
+  "daySpecific": Bool,
+  "timestamp": Time,
+  "sessionId": Text$1,
+  "affectedSlots": Vec(Text$1),
+  "eventType": AnalyticsEventType$1
+});
+const TimetableSlot = Record({
+  "id": Text$1,
+  "day": Nat,
+  "timePeriod": Nat
+});
+const UserProfile = Record({ "name": Text$1 });
+const Error$1 = Variant({
+  "FrontendOriginsNotConfigured": Null,
+  "MixedSsoSources": Record({
+    "otherKeys": Vec(Text$1),
+    "ssoKeys": Vec(Text$1)
+  }),
+  "Stale": Record({ "ageNs": Nat }),
+  "MalformedCandid": Null,
+  "AmbiguousAttribute": Record({
+    "field": Text$1,
+    "sources": Vec(Text$1)
+  }),
+  "NoAttributes": Null,
+  "UnknownNonce": Null,
+  "UntrustedSsoSource": Record({ "domain": Text$1 }),
+  "MissingField": Text$1,
+  "FrontendOriginMismatch": Record({
+    "got": Text$1,
+    "expected": Vec(Text$1)
+  })
+});
+const Result = Variant({ "ok": Null, "err": Error$1 });
+const UserRole = Variant({
+  "admin": Null,
+  "user": Null,
+  "guest": Null
+});
+const AdminAnalyticsResponse = Record({
+  "averageSlotsPerSession": Nat,
+  "recentActivity": Vec(AnalyticsEvent),
+  "dayAwareClashFrequency": Vec(Tuple(Text$1, Nat)),
+  "dailyUsage": Vec(Tuple(Text$1, Nat)),
+  "slotPopularity": Vec(Tuple(Text$1, Nat)),
+  "totalSessions": Nat,
+  "totalCourses": Nat,
+  "uniqueUsers": Nat
+});
+Service({
+  "__accessControlState": Func([], [Reserved], ["query"]),
+  "__analyticsEvents": Func(
+    [Opt(Nat), Opt(Nat)],
+    [Vec(AnalyticsEvent)],
+    ["query"]
+  ),
+  "__clashFrequency": Func(
+    [Opt(Text$1), Opt(Nat)],
+    [Vec(Tuple(Text$1, Nat))],
+    ["query"]
+  ),
+  "__dailyUsage": Func(
+    [Opt(Text$1), Opt(Nat)],
+    [Vec(Tuple(Text$1, Nat))],
+    ["query"]
+  ),
+  "__sessionIds": Func(
+    [Opt(Text$1), Opt(Nat)],
+    [Vec(Tuple(Text$1, Null))],
+    ["query"]
+  ),
+  "__slotPopularity": Func(
+    [Opt(Text$1), Opt(Nat)],
+    [Vec(Tuple(Text$1, Nat))],
+    ["query"]
+  ),
+  "__timetableSlots": Func(
+    [Opt(Text$1), Opt(Nat)],
+    [Vec(Tuple(Text$1, TimetableSlot))],
+    ["query"]
+  ),
+  "__userProfiles": Func(
+    [Opt(Principal2), Opt(Nat)],
+    [Vec(Tuple(Principal2, UserProfile))],
+    ["query"]
+  ),
+  "_initialize_access_control": Func([], [], []),
+  "_internet_identity_sign_in_finish": Func([], [Result], []),
+  "_internet_identity_sign_in_start": Func([], [Vec(Nat8)], []),
+  "addTimetableSlot": Func([TimetableSlot], [], []),
+  "assignCallerUserRole": Func([Principal2, UserRole], [], []),
+  "getAdminAnalytics": Func(
+    [Text$1],
+    [AdminAnalyticsResponse],
+    ["query"]
+  ),
+  "getAllTimetableSlots": Func([], [Vec(TimetableSlot)], ["query"]),
+  "getCallerUserProfile": Func([], [Opt(UserProfile)], ["query"]),
+  "getCallerUserRole": Func([], [UserRole], ["query"]),
+  "getDayLabel": Func([Nat], [Opt(Text$1)], ["query"]),
+  "getTimePeriodLabel": Func([Nat], [Opt(Text$1)], ["query"]),
+  "getTimetableSlot": Func(
+    [Text$1],
+    [Opt(TimetableSlot)],
+    ["query"]
+  ),
+  "getUserProfile": Func(
+    [Principal2],
+    [Opt(UserProfile)],
+    ["query"]
+  ),
+  "isCallerAdmin": Func([], [Bool], ["query"]),
+  "saveCallerUserProfile": Func([UserProfile], [], []),
+  "trackEvent": Func([AnalyticsEvent], [], [])
+});
+const idlFactory = ({ IDL: IDL2 }) => {
+  const Time2 = IDL2.Int;
+  const AnalyticsEventType2 = IDL2.Variant({
+    "clashDetected": IDL2.Null,
+    "sessionStart": IDL2.Null,
+    "courseRemoved": IDL2.Null,
+    "courseCreated": IDL2.Null,
+    "slotSelected": IDL2.Null,
+    "reset": IDL2.Null
+  });
+  const AnalyticsEvent2 = IDL2.Record({
+    "courseCount": IDL2.Nat,
+    "duration": IDL2.Nat,
+    "clashCount": IDL2.Nat,
+    "slotCount": IDL2.Nat,
+    "daySpecific": IDL2.Bool,
+    "timestamp": Time2,
+    "sessionId": IDL2.Text,
+    "affectedSlots": IDL2.Vec(IDL2.Text),
+    "eventType": AnalyticsEventType2
+  });
+  const TimetableSlot2 = IDL2.Record({
+    "id": IDL2.Text,
+    "day": IDL2.Nat,
+    "timePeriod": IDL2.Nat
+  });
+  const UserProfile2 = IDL2.Record({ "name": IDL2.Text });
+  const Error2 = IDL2.Variant({
+    "FrontendOriginsNotConfigured": IDL2.Null,
+    "MixedSsoSources": IDL2.Record({
+      "otherKeys": IDL2.Vec(IDL2.Text),
+      "ssoKeys": IDL2.Vec(IDL2.Text)
+    }),
+    "Stale": IDL2.Record({ "ageNs": IDL2.Nat }),
+    "MalformedCandid": IDL2.Null,
+    "AmbiguousAttribute": IDL2.Record({
+      "field": IDL2.Text,
+      "sources": IDL2.Vec(IDL2.Text)
+    }),
+    "NoAttributes": IDL2.Null,
+    "UnknownNonce": IDL2.Null,
+    "UntrustedSsoSource": IDL2.Record({ "domain": IDL2.Text }),
+    "MissingField": IDL2.Text,
+    "FrontendOriginMismatch": IDL2.Record({
+      "got": IDL2.Text,
+      "expected": IDL2.Vec(IDL2.Text)
+    })
+  });
+  const Result2 = IDL2.Variant({ "ok": IDL2.Null, "err": Error2 });
+  const UserRole2 = IDL2.Variant({
+    "admin": IDL2.Null,
+    "user": IDL2.Null,
+    "guest": IDL2.Null
+  });
+  const AdminAnalyticsResponse2 = IDL2.Record({
+    "averageSlotsPerSession": IDL2.Nat,
+    "recentActivity": IDL2.Vec(AnalyticsEvent2),
+    "dayAwareClashFrequency": IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat)),
+    "dailyUsage": IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat)),
+    "slotPopularity": IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat)),
+    "totalSessions": IDL2.Nat,
+    "totalCourses": IDL2.Nat,
+    "uniqueUsers": IDL2.Nat
+  });
+  return IDL2.Service({
+    "__accessControlState": IDL2.Func([], [IDL2.Reserved], ["query"]),
+    "__analyticsEvents": IDL2.Func(
+      [IDL2.Opt(IDL2.Nat), IDL2.Opt(IDL2.Nat)],
+      [IDL2.Vec(AnalyticsEvent2)],
+      ["query"]
+    ),
+    "__clashFrequency": IDL2.Func(
+      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
+      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat))],
+      ["query"]
+    ),
+    "__dailyUsage": IDL2.Func(
+      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
+      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat))],
+      ["query"]
+    ),
+    "__sessionIds": IDL2.Func(
+      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
+      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Null))],
+      ["query"]
+    ),
+    "__slotPopularity": IDL2.Func(
+      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
+      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat))],
+      ["query"]
+    ),
+    "__timetableSlots": IDL2.Func(
+      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
+      [IDL2.Vec(IDL2.Tuple(IDL2.Text, TimetableSlot2))],
+      ["query"]
+    ),
+    "__userProfiles": IDL2.Func(
+      [IDL2.Opt(IDL2.Principal), IDL2.Opt(IDL2.Nat)],
+      [IDL2.Vec(IDL2.Tuple(IDL2.Principal, UserProfile2))],
+      ["query"]
+    ),
+    "_initialize_access_control": IDL2.Func([], [], []),
+    "_internet_identity_sign_in_finish": IDL2.Func([], [Result2], []),
+    "_internet_identity_sign_in_start": IDL2.Func([], [IDL2.Vec(IDL2.Nat8)], []),
+    "addTimetableSlot": IDL2.Func([TimetableSlot2], [], []),
+    "assignCallerUserRole": IDL2.Func([IDL2.Principal, UserRole2], [], []),
+    "getAdminAnalytics": IDL2.Func(
+      [IDL2.Text],
+      [AdminAnalyticsResponse2],
+      ["query"]
+    ),
+    "getAllTimetableSlots": IDL2.Func([], [IDL2.Vec(TimetableSlot2)], ["query"]),
+    "getCallerUserProfile": IDL2.Func([], [IDL2.Opt(UserProfile2)], ["query"]),
+    "getCallerUserRole": IDL2.Func([], [UserRole2], ["query"]),
+    "getDayLabel": IDL2.Func([IDL2.Nat], [IDL2.Opt(IDL2.Text)], ["query"]),
+    "getTimePeriodLabel": IDL2.Func([IDL2.Nat], [IDL2.Opt(IDL2.Text)], ["query"]),
+    "getTimetableSlot": IDL2.Func(
+      [IDL2.Text],
+      [IDL2.Opt(TimetableSlot2)],
+      ["query"]
+    ),
+    "getUserProfile": IDL2.Func(
+      [IDL2.Principal],
+      [IDL2.Opt(UserProfile2)],
+      ["query"]
+    ),
+    "isCallerAdmin": IDL2.Func([], [IDL2.Bool], ["query"]),
+    "saveCallerUserProfile": IDL2.Func([UserProfile2], [], []),
+    "trackEvent": IDL2.Func([AnalyticsEvent2], [], [])
+  });
+};
+new TextEncoder().encode("icfs-chunk/");
+new TextEncoder().encode("icfs-metadata/");
+new TextEncoder().encode("ynode/");
+function candid_some(value) {
+  return [
+    value
+  ];
+}
+function candid_none() {
+  return [];
+}
+var AnalyticsEventType = /* @__PURE__ */ ((AnalyticsEventType2) => {
+  AnalyticsEventType2["clashDetected"] = "clashDetected";
+  AnalyticsEventType2["sessionStart"] = "sessionStart";
+  AnalyticsEventType2["courseRemoved"] = "courseRemoved";
+  AnalyticsEventType2["courseCreated"] = "courseCreated";
+  AnalyticsEventType2["slotSelected"] = "slotSelected";
+  AnalyticsEventType2["reset"] = "reset";
+  return AnalyticsEventType2;
+})(AnalyticsEventType || {});
+class Backend {
+  constructor(actor, _uploadFile, _downloadFile, processError2) {
+    this.actor = actor;
+    this._uploadFile = _uploadFile;
+    this._downloadFile = _downloadFile;
+    this.processError = processError2;
+  }
+  async __accessControlState() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__accessControlState();
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__accessControlState();
+      return result;
+    }
+  }
+  async __analyticsEvents(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__analyticsEvents(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+        return from_candid_vec_n2(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__analyticsEvents(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+      return from_candid_vec_n2(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async __clashFrequency(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__clashFrequency(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__clashFrequency(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async __dailyUsage(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__dailyUsage(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__dailyUsage(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async __sessionIds(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__sessionIds(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__sessionIds(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async __slotPopularity(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__slotPopularity(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__slotPopularity(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async __timetableSlots(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__timetableSlots(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__timetableSlots(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async __userProfiles(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.__userProfiles(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.__userProfiles(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async _initialize_access_control() {
+    if (this.processError) {
+      try {
+        const result = await this.actor._initialize_access_control();
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor._initialize_access_control();
+      return result;
+    }
+  }
+  async _internet_identity_sign_in_finish() {
+    if (this.processError) {
+      try {
+        const result = await this.actor._internet_identity_sign_in_finish();
+        return from_candid_Result_n9(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor._internet_identity_sign_in_finish();
+      return from_candid_Result_n9(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async _internet_identity_sign_in_start() {
+    if (this.processError) {
+      try {
+        const result = await this.actor._internet_identity_sign_in_start();
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor._internet_identity_sign_in_start();
+      return result;
+    }
+  }
+  async addTimetableSlot(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.addTimetableSlot(arg0);
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.addTimetableSlot(arg0);
+      return result;
+    }
+  }
+  async assignCallerUserRole(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n13(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n13(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async getAdminAnalytics(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getAdminAnalytics(arg0);
+        return from_candid_AdminAnalyticsResponse_n15(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getAdminAnalytics(arg0);
+      return from_candid_AdminAnalyticsResponse_n15(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getAllTimetableSlots() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getAllTimetableSlots();
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getAllTimetableSlots();
+      return result;
+    }
+  }
+  async getCallerUserProfile() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getCallerUserProfile();
+        return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getCallerUserProfile();
+      return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getCallerUserRole() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getCallerUserRole();
+        return from_candid_UserRole_n18(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getCallerUserRole();
+      return from_candid_UserRole_n18(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getDayLabel(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getDayLabel(arg0);
+        return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getDayLabel(arg0);
+      return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getTimePeriodLabel(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getTimePeriodLabel(arg0);
+        return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getTimePeriodLabel(arg0);
+      return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getTimetableSlot(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getTimetableSlot(arg0);
+        return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getTimetableSlot(arg0);
+      return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getUserProfile(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getUserProfile(arg0);
+        return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getUserProfile(arg0);
+      return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async isCallerAdmin() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.isCallerAdmin();
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.isCallerAdmin();
+      return result;
+    }
+  }
+  async saveCallerUserProfile(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.saveCallerUserProfile(arg0);
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.saveCallerUserProfile(arg0);
+      return result;
+    }
+  }
+  async trackEvent(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.trackEvent(to_candid_AnalyticsEvent_n22(this._uploadFile, this._downloadFile, arg0));
+        return result;
+      } catch (e3) {
+        this.processError(e3);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.trackEvent(to_candid_AnalyticsEvent_n22(this._uploadFile, this._downloadFile, arg0));
+      return result;
+    }
+  }
+}
+function from_candid_AdminAnalyticsResponse_n15(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n16(_uploadFile, _downloadFile, value);
+}
+function from_candid_AnalyticsEventType_n5(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n6(_uploadFile, _downloadFile, value);
+}
+function from_candid_AnalyticsEvent_n3(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n4(_uploadFile, _downloadFile, value);
+}
+function from_candid_Error_n11(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n12(_uploadFile, _downloadFile, value);
+}
+function from_candid_Result_n9(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n10(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n18(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n19(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n17(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n20(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n21(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n16(_uploadFile, _downloadFile, value) {
+  return {
+    averageSlotsPerSession: value.averageSlotsPerSession,
+    recentActivity: from_candid_vec_n2(_uploadFile, _downloadFile, value.recentActivity),
+    dayAwareClashFrequency: value.dayAwareClashFrequency,
+    dailyUsage: value.dailyUsage,
+    slotPopularity: value.slotPopularity,
+    totalSessions: value.totalSessions,
+    totalCourses: value.totalCourses,
+    uniqueUsers: value.uniqueUsers
+  };
+}
+function from_candid_record_n4(_uploadFile, _downloadFile, value) {
+  return {
+    courseCount: value.courseCount,
+    duration: value.duration,
+    clashCount: value.clashCount,
+    slotCount: value.slotCount,
+    daySpecific: value.daySpecific,
+    timestamp: value.timestamp,
+    sessionId: value.sessionId,
+    affectedSlots: value.affectedSlots,
+    eventType: from_candid_AnalyticsEventType_n5(_uploadFile, _downloadFile, value.eventType)
+  };
+}
+function from_candid_variant_n10(_uploadFile, _downloadFile, value) {
+  return "ok" in value ? {
+    __kind__: "ok",
+    ok: value.ok
+  } : "err" in value ? {
+    __kind__: "err",
+    err: from_candid_Error_n11(_uploadFile, _downloadFile, value.err)
+  } : value;
+}
+function from_candid_variant_n12(_uploadFile, _downloadFile, value) {
+  return "FrontendOriginsNotConfigured" in value ? {
+    __kind__: "FrontendOriginsNotConfigured",
+    FrontendOriginsNotConfigured: value.FrontendOriginsNotConfigured
+  } : "MixedSsoSources" in value ? {
+    __kind__: "MixedSsoSources",
+    MixedSsoSources: value.MixedSsoSources
+  } : "Stale" in value ? {
+    __kind__: "Stale",
+    Stale: value.Stale
+  } : "MalformedCandid" in value ? {
+    __kind__: "MalformedCandid",
+    MalformedCandid: value.MalformedCandid
+  } : "AmbiguousAttribute" in value ? {
+    __kind__: "AmbiguousAttribute",
+    AmbiguousAttribute: value.AmbiguousAttribute
+  } : "NoAttributes" in value ? {
+    __kind__: "NoAttributes",
+    NoAttributes: value.NoAttributes
+  } : "UnknownNonce" in value ? {
+    __kind__: "UnknownNonce",
+    UnknownNonce: value.UnknownNonce
+  } : "UntrustedSsoSource" in value ? {
+    __kind__: "UntrustedSsoSource",
+    UntrustedSsoSource: value.UntrustedSsoSource
+  } : "MissingField" in value ? {
+    __kind__: "MissingField",
+    MissingField: value.MissingField
+  } : "FrontendOriginMismatch" in value ? {
+    __kind__: "FrontendOriginMismatch",
+    FrontendOriginMismatch: value.FrontendOriginMismatch
+  } : value;
+}
+function from_candid_variant_n19(_uploadFile, _downloadFile, value) {
+  return "admin" in value ? "admin" : "user" in value ? "user" : "guest" in value ? "guest" : value;
+}
+function from_candid_variant_n6(_uploadFile, _downloadFile, value) {
+  return "clashDetected" in value ? "clashDetected" : "sessionStart" in value ? "sessionStart" : "courseRemoved" in value ? "courseRemoved" : "courseCreated" in value ? "courseCreated" : "slotSelected" in value ? "slotSelected" : "reset" in value ? "reset" : value;
+}
+function from_candid_vec_n2(_uploadFile, _downloadFile, value) {
+  return value.map((x3) => from_candid_AnalyticsEvent_n3(_uploadFile, _downloadFile, x3));
+}
+function to_candid_AnalyticsEventType_n24(_uploadFile, _downloadFile, value) {
+  return to_candid_variant_n25(_uploadFile, _downloadFile, value);
+}
+function to_candid_AnalyticsEvent_n22(_uploadFile, _downloadFile, value) {
+  return to_candid_record_n23(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n13(_uploadFile, _downloadFile, value) {
+  return to_candid_variant_n14(_uploadFile, _downloadFile, value);
+}
+function to_candid_opt_n1(_uploadFile, _downloadFile, value) {
+  return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_opt_n7(_uploadFile, _downloadFile, value) {
+  return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_opt_n8(_uploadFile, _downloadFile, value) {
+  return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_record_n23(_uploadFile, _downloadFile, value) {
+  return {
+    courseCount: value.courseCount,
+    duration: value.duration,
+    clashCount: value.clashCount,
+    slotCount: value.slotCount,
+    daySpecific: value.daySpecific,
+    timestamp: value.timestamp,
+    sessionId: value.sessionId,
+    affectedSlots: value.affectedSlots,
+    eventType: to_candid_AnalyticsEventType_n24(_uploadFile, _downloadFile, value.eventType)
+  };
+}
+function to_candid_variant_n14(_uploadFile, _downloadFile, value) {
+  return value == "admin" ? {
+    admin: null
+  } : value == "user" ? {
+    user: null
+  } : value == "guest" ? {
+    guest: null
+  } : value;
+}
+function to_candid_variant_n25(_uploadFile, _downloadFile, value) {
+  return value == "clashDetected" ? {
+    clashDetected: null
+  } : value == "sessionStart" ? {
+    sessionStart: null
+  } : value == "courseRemoved" ? {
+    courseRemoved: null
+  } : value == "courseCreated" ? {
+    courseCreated: null
+  } : value == "slotSelected" ? {
+    slotSelected: null
+  } : value == "reset" ? {
+    reset: null
+  } : value;
+}
+function createActor(canisterId, _uploadFile, _downloadFile, options = {}) {
+  const agent = options.agent || HttpAgent.createSync({
+    ...options.agentOptions
+  });
+  if (options.agent && options.agentOptions) {
+    console.warn("Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.");
+  }
+  const actor = Actor.createActor(idlFactory, {
+    agent,
+    canisterId,
+    ...options.actorOptions
+  });
+  return new Backend(actor, _uploadFile, _downloadFile, options.processError);
+}
+function useGetAdminAnalytics() {
+  const { actor, isFetching } = useActor(createActor);
+  return useQuery({
+    queryKey: ["adminAnalytics"],
+    queryFn: async () => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.getAdminAnalytics("admin123");
+    },
+    enabled: !!actor && !isFetching,
+    staleTime: 3e4
+    // Cache for 30 seconds
+  });
+}
+function useGetTotalSessions() {
+  const { data, isLoading, error } = useGetAdminAnalytics();
+  return {
+    data: data == null ? void 0 : data.totalSessions,
+    isLoading,
+    error
+  };
+}
+function useGetTotalCourses() {
+  const { data, isLoading, error } = useGetAdminAnalytics();
+  return {
+    data: data == null ? void 0 : data.totalCourses,
+    isLoading,
+    error
+  };
+}
+function useGetAverageSlotsPerSession() {
+  const { data, isLoading, error } = useGetAdminAnalytics();
+  return {
+    data: data == null ? void 0 : data.averageSlotsPerSession,
+    isLoading,
+    error
+  };
+}
+function useGetSlotPopularity() {
+  const { data, isLoading, error } = useGetAdminAnalytics();
+  return {
+    data: data == null ? void 0 : data.slotPopularity,
+    isLoading,
+    error
+  };
+}
+function useGetDailyUsage() {
+  const { data, isLoading, error } = useGetAdminAnalytics();
+  return {
+    data: data == null ? void 0 : data.dailyUsage,
+    isLoading,
+    error
+  };
+}
+function useGetRecentActivity(limit = 20) {
+  const { data, isLoading, error } = useGetAdminAnalytics();
+  return {
+    data: data == null ? void 0 : data.recentActivity.slice(0, limit),
+    isLoading,
+    error
+  };
+}
+function useGetClashFrequency() {
+  const { data, isLoading, error } = useGetAdminAnalytics();
+  return {
+    data: data == null ? void 0 : data.dayAwareClashFrequency,
+    isLoading,
+    error
+  };
+}
+function useTrackEvent() {
+  const { actor } = useActor(createActor);
+  const queryClient2 = useQueryClient();
+  return useMutation({
+    mutationFn: async (event) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.trackEvent(event);
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["adminAnalytics"] });
+    }
+  });
+}
+const AnalyticsContext = reactExports.createContext(
+  void 0
+);
+const SESSION_ID_KEY = "timetable_session_id";
+const SESSION_START_KEY = "timetable_session_start";
+function generateSessionId() {
+  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+function getOrCreateSessionId() {
+  let sessionId = sessionStorage.getItem(SESSION_ID_KEY);
+  if (!sessionId) {
+    sessionId = generateSessionId();
+    sessionStorage.setItem(SESSION_ID_KEY, sessionId);
+    sessionStorage.setItem(SESSION_START_KEY, Date.now().toString());
+  }
+  return sessionId;
+}
+function getSessionDuration() {
+  const startTime = sessionStorage.getItem(SESSION_START_KEY);
+  if (!startTime) return 0;
+  return Date.now() - Number.parseInt(startTime, 10);
+}
+function AnalyticsProvider({ children }) {
+  const [sessionId] = reactExports.useState(getOrCreateSessionId);
+  const { mutate: trackEvent } = useTrackEvent();
+  const trackSessionStart = reactExports.useCallback(() => {
+    trackEvent({
+      sessionId,
+      timestamp: BigInt(Date.now() * 1e6),
+      // Convert to nanoseconds
+      eventType: AnalyticsEventType.sessionStart,
+      slotCount: BigInt(0),
+      courseCount: BigInt(0),
+      duration: BigInt(0),
+      clashCount: BigInt(0),
+      affectedSlots: [],
+      daySpecific: true
+    });
+  }, [sessionId, trackEvent]);
+  const trackCourseCreated = reactExports.useCallback(
+    (courseCount) => {
+      trackEvent({
+        sessionId,
+        timestamp: BigInt(Date.now() * 1e6),
+        eventType: AnalyticsEventType.courseCreated,
+        slotCount: BigInt(0),
+        courseCount: BigInt(courseCount),
+        duration: BigInt(getSessionDuration()),
+        clashCount: BigInt(0),
+        affectedSlots: [],
+        daySpecific: true
+      });
+    },
+    [sessionId, trackEvent]
+  );
+  const trackSlotSelected = reactExports.useCallback(
+    (slotCount) => {
+      trackEvent({
+        sessionId,
+        timestamp: BigInt(Date.now() * 1e6),
+        eventType: AnalyticsEventType.slotSelected,
+        slotCount: BigInt(slotCount),
+        courseCount: BigInt(0),
+        duration: BigInt(getSessionDuration()),
+        clashCount: BigInt(0),
+        affectedSlots: [],
+        daySpecific: true
+      });
+    },
+    [sessionId, trackEvent]
+  );
+  const trackCourseRemoved = reactExports.useCallback(
+    (courseCount) => {
+      trackEvent({
+        sessionId,
+        timestamp: BigInt(Date.now() * 1e6),
+        eventType: AnalyticsEventType.courseRemoved,
+        slotCount: BigInt(0),
+        courseCount: BigInt(courseCount),
+        duration: BigInt(getSessionDuration()),
+        clashCount: BigInt(0),
+        affectedSlots: [],
+        daySpecific: true
+      });
+    },
+    [sessionId, trackEvent]
+  );
+  const trackReset = reactExports.useCallback(() => {
+    trackEvent({
+      sessionId,
+      timestamp: BigInt(Date.now() * 1e6),
+      eventType: AnalyticsEventType.reset,
+      slotCount: BigInt(0),
+      courseCount: BigInt(0),
+      duration: BigInt(getSessionDuration()),
+      clashCount: BigInt(0),
+      affectedSlots: [],
+      daySpecific: true
+    });
+  }, [sessionId, trackEvent]);
+  const trackClashDetected = reactExports.useCallback(
+    (clashCount, affectedSlots) => {
+      trackEvent({
+        sessionId,
+        timestamp: BigInt(Date.now() * 1e6),
+        eventType: AnalyticsEventType.clashDetected,
+        slotCount: BigInt(0),
+        courseCount: BigInt(0),
+        duration: BigInt(getSessionDuration()),
+        clashCount: BigInt(clashCount),
+        affectedSlots,
+        daySpecific: true
+        // All clashes are now day-specific
+      });
+    },
+    [sessionId, trackEvent]
+  );
+  reactExports.useEffect(() => {
+    trackSessionStart();
+  }, [trackSessionStart]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    AnalyticsContext.Provider,
+    {
+      value: {
+        sessionId,
+        trackSessionStart,
+        trackCourseCreated,
+        trackSlotSelected,
+        trackCourseRemoved,
+        trackReset,
+        trackClashDetected
+      },
+      children
+    }
+  );
+}
+function useAnalytics() {
+  const context = reactExports.useContext(AnalyticsContext);
+  if (!context) {
+    throw new Error("useAnalytics must be used within AnalyticsProvider");
+  }
+  return context;
+}
+function Layout({ children }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(AnalyticsProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(J, { attribute: "class", defaultTheme: "system", enableSystem: true, children: [
+    children,
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Toaster, {})
+  ] }) });
+}
 var prefix = "Invariant failed";
 function invariant(condition, message) {
   if (condition) {
@@ -30094,9 +30956,9 @@ function replaceEqualDeep(prev, _next) {
 function getEnumerableOwnKeys(o) {
   const keys2 = [];
   const names = Object.getOwnPropertyNames(o);
-  for (const name2 of names) {
-    if (!Object.prototype.propertyIsEnumerable.call(o, name2)) return false;
-    keys2.push(name2);
+  for (const name of names) {
+    if (!Object.prototype.propertyIsEnumerable.call(o, name)) return false;
+    keys2.push(name);
   }
   const symbols = Object.getOwnPropertySymbols(o);
   for (const symbol of symbols) {
@@ -37780,1027 +38642,6 @@ const __iconNode = [
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
 const X = createLucideIcon("x", __iconNode);
-const Time = Int;
-const AnalyticsEventType$1 = Variant({
-  "clashDetected": Null,
-  "sessionStart": Null,
-  "courseRemoved": Null,
-  "courseCreated": Null,
-  "slotSelected": Null,
-  "reset": Null
-});
-const AnalyticsEvent = Record({
-  "courseCount": Nat,
-  "duration": Nat,
-  "clashCount": Nat,
-  "slotCount": Nat,
-  "daySpecific": Bool,
-  "timestamp": Time,
-  "sessionId": Text$1,
-  "affectedSlots": Vec(Text$1),
-  "eventType": AnalyticsEventType$1
-});
-const TimetableSlot = Record({
-  "id": Text$1,
-  "day": Nat,
-  "timePeriod": Nat
-});
-const UserProfile = Record({ "name": Text$1 });
-const Error$1 = Variant({
-  "FrontendOriginsNotConfigured": Null,
-  "MixedSsoSources": Record({
-    "otherKeys": Vec(Text$1),
-    "ssoKeys": Vec(Text$1)
-  }),
-  "Stale": Record({ "ageNs": Nat }),
-  "MalformedCandid": Null,
-  "AmbiguousAttribute": Record({
-    "field": Text$1,
-    "sources": Vec(Text$1)
-  }),
-  "NoAttributes": Null,
-  "UnknownNonce": Null,
-  "UntrustedSsoSource": Record({ "domain": Text$1 }),
-  "MissingField": Text$1,
-  "FrontendOriginMismatch": Record({
-    "got": Text$1,
-    "expected": Vec(Text$1)
-  })
-});
-const Result = Variant({ "ok": Null, "err": Error$1 });
-const UserRole = Variant({
-  "admin": Null,
-  "user": Null,
-  "guest": Null
-});
-const AdminAnalyticsResponse = Record({
-  "averageSlotsPerSession": Nat,
-  "recentActivity": Vec(AnalyticsEvent),
-  "dayAwareClashFrequency": Vec(Tuple(Text$1, Nat)),
-  "dailyUsage": Vec(Tuple(Text$1, Nat)),
-  "slotPopularity": Vec(Tuple(Text$1, Nat)),
-  "totalSessions": Nat,
-  "totalCourses": Nat,
-  "uniqueUsers": Nat
-});
-Service({
-  "__accessControlState": Func([], [Reserved], ["query"]),
-  "__analyticsEvents": Func(
-    [Opt(Nat), Opt(Nat)],
-    [Vec(AnalyticsEvent)],
-    ["query"]
-  ),
-  "__clashFrequency": Func(
-    [Opt(Text$1), Opt(Nat)],
-    [Vec(Tuple(Text$1, Nat))],
-    ["query"]
-  ),
-  "__dailyUsage": Func(
-    [Opt(Text$1), Opt(Nat)],
-    [Vec(Tuple(Text$1, Nat))],
-    ["query"]
-  ),
-  "__sessionIds": Func(
-    [Opt(Text$1), Opt(Nat)],
-    [Vec(Tuple(Text$1, Null))],
-    ["query"]
-  ),
-  "__slotPopularity": Func(
-    [Opt(Text$1), Opt(Nat)],
-    [Vec(Tuple(Text$1, Nat))],
-    ["query"]
-  ),
-  "__timetableSlots": Func(
-    [Opt(Text$1), Opt(Nat)],
-    [Vec(Tuple(Text$1, TimetableSlot))],
-    ["query"]
-  ),
-  "__userProfiles": Func(
-    [Opt(Principal2), Opt(Nat)],
-    [Vec(Tuple(Principal2, UserProfile))],
-    ["query"]
-  ),
-  "_initialize_access_control": Func([], [], []),
-  "_internet_identity_sign_in_finish": Func([], [Result], []),
-  "_internet_identity_sign_in_start": Func([], [Vec(Nat8)], []),
-  "addTimetableSlot": Func([TimetableSlot], [], []),
-  "assignCallerUserRole": Func([Principal2, UserRole], [], []),
-  "getAdminAnalytics": Func(
-    [Text$1],
-    [AdminAnalyticsResponse],
-    ["query"]
-  ),
-  "getAllTimetableSlots": Func([], [Vec(TimetableSlot)], ["query"]),
-  "getCallerUserProfile": Func([], [Opt(UserProfile)], ["query"]),
-  "getCallerUserRole": Func([], [UserRole], ["query"]),
-  "getDayLabel": Func([Nat], [Opt(Text$1)], ["query"]),
-  "getTimePeriodLabel": Func([Nat], [Opt(Text$1)], ["query"]),
-  "getTimetableSlot": Func(
-    [Text$1],
-    [Opt(TimetableSlot)],
-    ["query"]
-  ),
-  "getUserProfile": Func(
-    [Principal2],
-    [Opt(UserProfile)],
-    ["query"]
-  ),
-  "isCallerAdmin": Func([], [Bool], ["query"]),
-  "saveCallerUserProfile": Func([UserProfile], [], []),
-  "trackEvent": Func([AnalyticsEvent], [], [])
-});
-const idlFactory = ({ IDL: IDL2 }) => {
-  const Time2 = IDL2.Int;
-  const AnalyticsEventType2 = IDL2.Variant({
-    "clashDetected": IDL2.Null,
-    "sessionStart": IDL2.Null,
-    "courseRemoved": IDL2.Null,
-    "courseCreated": IDL2.Null,
-    "slotSelected": IDL2.Null,
-    "reset": IDL2.Null
-  });
-  const AnalyticsEvent2 = IDL2.Record({
-    "courseCount": IDL2.Nat,
-    "duration": IDL2.Nat,
-    "clashCount": IDL2.Nat,
-    "slotCount": IDL2.Nat,
-    "daySpecific": IDL2.Bool,
-    "timestamp": Time2,
-    "sessionId": IDL2.Text,
-    "affectedSlots": IDL2.Vec(IDL2.Text),
-    "eventType": AnalyticsEventType2
-  });
-  const TimetableSlot2 = IDL2.Record({
-    "id": IDL2.Text,
-    "day": IDL2.Nat,
-    "timePeriod": IDL2.Nat
-  });
-  const UserProfile2 = IDL2.Record({ "name": IDL2.Text });
-  const Error2 = IDL2.Variant({
-    "FrontendOriginsNotConfigured": IDL2.Null,
-    "MixedSsoSources": IDL2.Record({
-      "otherKeys": IDL2.Vec(IDL2.Text),
-      "ssoKeys": IDL2.Vec(IDL2.Text)
-    }),
-    "Stale": IDL2.Record({ "ageNs": IDL2.Nat }),
-    "MalformedCandid": IDL2.Null,
-    "AmbiguousAttribute": IDL2.Record({
-      "field": IDL2.Text,
-      "sources": IDL2.Vec(IDL2.Text)
-    }),
-    "NoAttributes": IDL2.Null,
-    "UnknownNonce": IDL2.Null,
-    "UntrustedSsoSource": IDL2.Record({ "domain": IDL2.Text }),
-    "MissingField": IDL2.Text,
-    "FrontendOriginMismatch": IDL2.Record({
-      "got": IDL2.Text,
-      "expected": IDL2.Vec(IDL2.Text)
-    })
-  });
-  const Result2 = IDL2.Variant({ "ok": IDL2.Null, "err": Error2 });
-  const UserRole2 = IDL2.Variant({
-    "admin": IDL2.Null,
-    "user": IDL2.Null,
-    "guest": IDL2.Null
-  });
-  const AdminAnalyticsResponse2 = IDL2.Record({
-    "averageSlotsPerSession": IDL2.Nat,
-    "recentActivity": IDL2.Vec(AnalyticsEvent2),
-    "dayAwareClashFrequency": IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat)),
-    "dailyUsage": IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat)),
-    "slotPopularity": IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat)),
-    "totalSessions": IDL2.Nat,
-    "totalCourses": IDL2.Nat,
-    "uniqueUsers": IDL2.Nat
-  });
-  return IDL2.Service({
-    "__accessControlState": IDL2.Func([], [IDL2.Reserved], ["query"]),
-    "__analyticsEvents": IDL2.Func(
-      [IDL2.Opt(IDL2.Nat), IDL2.Opt(IDL2.Nat)],
-      [IDL2.Vec(AnalyticsEvent2)],
-      ["query"]
-    ),
-    "__clashFrequency": IDL2.Func(
-      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
-      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat))],
-      ["query"]
-    ),
-    "__dailyUsage": IDL2.Func(
-      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
-      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat))],
-      ["query"]
-    ),
-    "__sessionIds": IDL2.Func(
-      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
-      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Null))],
-      ["query"]
-    ),
-    "__slotPopularity": IDL2.Func(
-      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
-      [IDL2.Vec(IDL2.Tuple(IDL2.Text, IDL2.Nat))],
-      ["query"]
-    ),
-    "__timetableSlots": IDL2.Func(
-      [IDL2.Opt(IDL2.Text), IDL2.Opt(IDL2.Nat)],
-      [IDL2.Vec(IDL2.Tuple(IDL2.Text, TimetableSlot2))],
-      ["query"]
-    ),
-    "__userProfiles": IDL2.Func(
-      [IDL2.Opt(IDL2.Principal), IDL2.Opt(IDL2.Nat)],
-      [IDL2.Vec(IDL2.Tuple(IDL2.Principal, UserProfile2))],
-      ["query"]
-    ),
-    "_initialize_access_control": IDL2.Func([], [], []),
-    "_internet_identity_sign_in_finish": IDL2.Func([], [Result2], []),
-    "_internet_identity_sign_in_start": IDL2.Func([], [IDL2.Vec(IDL2.Nat8)], []),
-    "addTimetableSlot": IDL2.Func([TimetableSlot2], [], []),
-    "assignCallerUserRole": IDL2.Func([IDL2.Principal, UserRole2], [], []),
-    "getAdminAnalytics": IDL2.Func(
-      [IDL2.Text],
-      [AdminAnalyticsResponse2],
-      ["query"]
-    ),
-    "getAllTimetableSlots": IDL2.Func([], [IDL2.Vec(TimetableSlot2)], ["query"]),
-    "getCallerUserProfile": IDL2.Func([], [IDL2.Opt(UserProfile2)], ["query"]),
-    "getCallerUserRole": IDL2.Func([], [UserRole2], ["query"]),
-    "getDayLabel": IDL2.Func([IDL2.Nat], [IDL2.Opt(IDL2.Text)], ["query"]),
-    "getTimePeriodLabel": IDL2.Func([IDL2.Nat], [IDL2.Opt(IDL2.Text)], ["query"]),
-    "getTimetableSlot": IDL2.Func(
-      [IDL2.Text],
-      [IDL2.Opt(TimetableSlot2)],
-      ["query"]
-    ),
-    "getUserProfile": IDL2.Func(
-      [IDL2.Principal],
-      [IDL2.Opt(UserProfile2)],
-      ["query"]
-    ),
-    "isCallerAdmin": IDL2.Func([], [IDL2.Bool], ["query"]),
-    "saveCallerUserProfile": IDL2.Func([UserProfile2], [], []),
-    "trackEvent": IDL2.Func([AnalyticsEvent2], [], [])
-  });
-};
-new TextEncoder().encode("icfs-chunk/");
-new TextEncoder().encode("icfs-metadata/");
-new TextEncoder().encode("ynode/");
-function candid_some(value) {
-  return [
-    value
-  ];
-}
-function candid_none() {
-  return [];
-}
-var AnalyticsEventType = /* @__PURE__ */ ((AnalyticsEventType2) => {
-  AnalyticsEventType2["clashDetected"] = "clashDetected";
-  AnalyticsEventType2["sessionStart"] = "sessionStart";
-  AnalyticsEventType2["courseRemoved"] = "courseRemoved";
-  AnalyticsEventType2["courseCreated"] = "courseCreated";
-  AnalyticsEventType2["slotSelected"] = "slotSelected";
-  AnalyticsEventType2["reset"] = "reset";
-  return AnalyticsEventType2;
-})(AnalyticsEventType || {});
-class Backend {
-  constructor(actor, _uploadFile, _downloadFile, processError2) {
-    this.actor = actor;
-    this._uploadFile = _uploadFile;
-    this._downloadFile = _downloadFile;
-    this.processError = processError2;
-  }
-  async __accessControlState() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__accessControlState();
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__accessControlState();
-      return result;
-    }
-  }
-  async __analyticsEvents(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__analyticsEvents(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-        return from_candid_vec_n2(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__analyticsEvents(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-      return from_candid_vec_n2(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async __clashFrequency(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__clashFrequency(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__clashFrequency(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async __dailyUsage(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__dailyUsage(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__dailyUsage(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async __sessionIds(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__sessionIds(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__sessionIds(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async __slotPopularity(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__slotPopularity(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__slotPopularity(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async __timetableSlots(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__timetableSlots(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__timetableSlots(to_candid_opt_n7(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async __userProfiles(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.__userProfiles(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.__userProfiles(to_candid_opt_n8(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async _initialize_access_control() {
-    if (this.processError) {
-      try {
-        const result = await this.actor._initialize_access_control();
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor._initialize_access_control();
-      return result;
-    }
-  }
-  async _internet_identity_sign_in_finish() {
-    if (this.processError) {
-      try {
-        const result = await this.actor._internet_identity_sign_in_finish();
-        return from_candid_Result_n9(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor._internet_identity_sign_in_finish();
-      return from_candid_Result_n9(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async _internet_identity_sign_in_start() {
-    if (this.processError) {
-      try {
-        const result = await this.actor._internet_identity_sign_in_start();
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor._internet_identity_sign_in_start();
-      return result;
-    }
-  }
-  async addTimetableSlot(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.addTimetableSlot(arg0);
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.addTimetableSlot(arg0);
-      return result;
-    }
-  }
-  async assignCallerUserRole(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n13(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n13(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async getAdminAnalytics(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getAdminAnalytics(arg0);
-        return from_candid_AdminAnalyticsResponse_n15(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getAdminAnalytics(arg0);
-      return from_candid_AdminAnalyticsResponse_n15(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getAllTimetableSlots() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getAllTimetableSlots();
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getAllTimetableSlots();
-      return result;
-    }
-  }
-  async getCallerUserProfile() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getCallerUserProfile();
-        return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getCallerUserProfile();
-      return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getCallerUserRole() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getCallerUserRole();
-        return from_candid_UserRole_n18(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getCallerUserRole();
-      return from_candid_UserRole_n18(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getDayLabel(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getDayLabel(arg0);
-        return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getDayLabel(arg0);
-      return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getTimePeriodLabel(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getTimePeriodLabel(arg0);
-        return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getTimePeriodLabel(arg0);
-      return from_candid_opt_n20(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getTimetableSlot(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getTimetableSlot(arg0);
-        return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getTimetableSlot(arg0);
-      return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getUserProfile(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getUserProfile(arg0);
-        return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getUserProfile(arg0);
-      return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async isCallerAdmin() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.isCallerAdmin();
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.isCallerAdmin();
-      return result;
-    }
-  }
-  async saveCallerUserProfile(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.saveCallerUserProfile(arg0);
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.saveCallerUserProfile(arg0);
-      return result;
-    }
-  }
-  async trackEvent(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.trackEvent(to_candid_AnalyticsEvent_n22(this._uploadFile, this._downloadFile, arg0));
-        return result;
-      } catch (e3) {
-        this.processError(e3);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.trackEvent(to_candid_AnalyticsEvent_n22(this._uploadFile, this._downloadFile, arg0));
-      return result;
-    }
-  }
-}
-function from_candid_AdminAnalyticsResponse_n15(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n16(_uploadFile, _downloadFile, value);
-}
-function from_candid_AnalyticsEventType_n5(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n6(_uploadFile, _downloadFile, value);
-}
-function from_candid_AnalyticsEvent_n3(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n4(_uploadFile, _downloadFile, value);
-}
-function from_candid_Error_n11(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n12(_uploadFile, _downloadFile, value);
-}
-function from_candid_Result_n9(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n10(_uploadFile, _downloadFile, value);
-}
-function from_candid_UserRole_n18(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n19(_uploadFile, _downloadFile, value);
-}
-function from_candid_opt_n17(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : value[0];
-}
-function from_candid_opt_n20(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : value[0];
-}
-function from_candid_opt_n21(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : value[0];
-}
-function from_candid_record_n16(_uploadFile, _downloadFile, value) {
-  return {
-    averageSlotsPerSession: value.averageSlotsPerSession,
-    recentActivity: from_candid_vec_n2(_uploadFile, _downloadFile, value.recentActivity),
-    dayAwareClashFrequency: value.dayAwareClashFrequency,
-    dailyUsage: value.dailyUsage,
-    slotPopularity: value.slotPopularity,
-    totalSessions: value.totalSessions,
-    totalCourses: value.totalCourses,
-    uniqueUsers: value.uniqueUsers
-  };
-}
-function from_candid_record_n4(_uploadFile, _downloadFile, value) {
-  return {
-    courseCount: value.courseCount,
-    duration: value.duration,
-    clashCount: value.clashCount,
-    slotCount: value.slotCount,
-    daySpecific: value.daySpecific,
-    timestamp: value.timestamp,
-    sessionId: value.sessionId,
-    affectedSlots: value.affectedSlots,
-    eventType: from_candid_AnalyticsEventType_n5(_uploadFile, _downloadFile, value.eventType)
-  };
-}
-function from_candid_variant_n10(_uploadFile, _downloadFile, value) {
-  return "ok" in value ? {
-    __kind__: "ok",
-    ok: value.ok
-  } : "err" in value ? {
-    __kind__: "err",
-    err: from_candid_Error_n11(_uploadFile, _downloadFile, value.err)
-  } : value;
-}
-function from_candid_variant_n12(_uploadFile, _downloadFile, value) {
-  return "FrontendOriginsNotConfigured" in value ? {
-    __kind__: "FrontendOriginsNotConfigured",
-    FrontendOriginsNotConfigured: value.FrontendOriginsNotConfigured
-  } : "MixedSsoSources" in value ? {
-    __kind__: "MixedSsoSources",
-    MixedSsoSources: value.MixedSsoSources
-  } : "Stale" in value ? {
-    __kind__: "Stale",
-    Stale: value.Stale
-  } : "MalformedCandid" in value ? {
-    __kind__: "MalformedCandid",
-    MalformedCandid: value.MalformedCandid
-  } : "AmbiguousAttribute" in value ? {
-    __kind__: "AmbiguousAttribute",
-    AmbiguousAttribute: value.AmbiguousAttribute
-  } : "NoAttributes" in value ? {
-    __kind__: "NoAttributes",
-    NoAttributes: value.NoAttributes
-  } : "UnknownNonce" in value ? {
-    __kind__: "UnknownNonce",
-    UnknownNonce: value.UnknownNonce
-  } : "UntrustedSsoSource" in value ? {
-    __kind__: "UntrustedSsoSource",
-    UntrustedSsoSource: value.UntrustedSsoSource
-  } : "MissingField" in value ? {
-    __kind__: "MissingField",
-    MissingField: value.MissingField
-  } : "FrontendOriginMismatch" in value ? {
-    __kind__: "FrontendOriginMismatch",
-    FrontendOriginMismatch: value.FrontendOriginMismatch
-  } : value;
-}
-function from_candid_variant_n19(_uploadFile, _downloadFile, value) {
-  return "admin" in value ? "admin" : "user" in value ? "user" : "guest" in value ? "guest" : value;
-}
-function from_candid_variant_n6(_uploadFile, _downloadFile, value) {
-  return "clashDetected" in value ? "clashDetected" : "sessionStart" in value ? "sessionStart" : "courseRemoved" in value ? "courseRemoved" : "courseCreated" in value ? "courseCreated" : "slotSelected" in value ? "slotSelected" : "reset" in value ? "reset" : value;
-}
-function from_candid_vec_n2(_uploadFile, _downloadFile, value) {
-  return value.map((x3) => from_candid_AnalyticsEvent_n3(_uploadFile, _downloadFile, x3));
-}
-function to_candid_AnalyticsEventType_n24(_uploadFile, _downloadFile, value) {
-  return to_candid_variant_n25(_uploadFile, _downloadFile, value);
-}
-function to_candid_AnalyticsEvent_n22(_uploadFile, _downloadFile, value) {
-  return to_candid_record_n23(_uploadFile, _downloadFile, value);
-}
-function to_candid_UserRole_n13(_uploadFile, _downloadFile, value) {
-  return to_candid_variant_n14(_uploadFile, _downloadFile, value);
-}
-function to_candid_opt_n1(_uploadFile, _downloadFile, value) {
-  return value === null ? candid_none() : candid_some(value);
-}
-function to_candid_opt_n7(_uploadFile, _downloadFile, value) {
-  return value === null ? candid_none() : candid_some(value);
-}
-function to_candid_opt_n8(_uploadFile, _downloadFile, value) {
-  return value === null ? candid_none() : candid_some(value);
-}
-function to_candid_record_n23(_uploadFile, _downloadFile, value) {
-  return {
-    courseCount: value.courseCount,
-    duration: value.duration,
-    clashCount: value.clashCount,
-    slotCount: value.slotCount,
-    daySpecific: value.daySpecific,
-    timestamp: value.timestamp,
-    sessionId: value.sessionId,
-    affectedSlots: value.affectedSlots,
-    eventType: to_candid_AnalyticsEventType_n24(_uploadFile, _downloadFile, value.eventType)
-  };
-}
-function to_candid_variant_n14(_uploadFile, _downloadFile, value) {
-  return value == "admin" ? {
-    admin: null
-  } : value == "user" ? {
-    user: null
-  } : value == "guest" ? {
-    guest: null
-  } : value;
-}
-function to_candid_variant_n25(_uploadFile, _downloadFile, value) {
-  return value == "clashDetected" ? {
-    clashDetected: null
-  } : value == "sessionStart" ? {
-    sessionStart: null
-  } : value == "courseRemoved" ? {
-    courseRemoved: null
-  } : value == "courseCreated" ? {
-    courseCreated: null
-  } : value == "slotSelected" ? {
-    slotSelected: null
-  } : value == "reset" ? {
-    reset: null
-  } : value;
-}
-function createActor(canisterId, _uploadFile, _downloadFile, options = {}) {
-  const agent = options.agent || HttpAgent.createSync({
-    ...options.agentOptions
-  });
-  if (options.agent && options.agentOptions) {
-    console.warn("Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.");
-  }
-  const actor = Actor.createActor(idlFactory, {
-    agent,
-    canisterId,
-    ...options.actorOptions
-  });
-  return new Backend(actor, _uploadFile, _downloadFile, options.processError);
-}
-function useGetAdminAnalytics() {
-  const { actor, isFetching } = useActor(createActor);
-  return useQuery({
-    queryKey: ["adminAnalytics"],
-    queryFn: async () => {
-      if (!actor) throw new Error("Actor not available");
-      return actor.getAdminAnalytics("admin123");
-    },
-    enabled: !!actor && !isFetching,
-    staleTime: 3e4
-    // Cache for 30 seconds
-  });
-}
-function useGetTotalSessions() {
-  const { data, isLoading, error } = useGetAdminAnalytics();
-  return {
-    data: data == null ? void 0 : data.totalSessions,
-    isLoading,
-    error
-  };
-}
-function useGetTotalCourses() {
-  const { data, isLoading, error } = useGetAdminAnalytics();
-  return {
-    data: data == null ? void 0 : data.totalCourses,
-    isLoading,
-    error
-  };
-}
-function useGetAverageSlotsPerSession() {
-  const { data, isLoading, error } = useGetAdminAnalytics();
-  return {
-    data: data == null ? void 0 : data.averageSlotsPerSession,
-    isLoading,
-    error
-  };
-}
-function useGetSlotPopularity() {
-  const { data, isLoading, error } = useGetAdminAnalytics();
-  return {
-    data: data == null ? void 0 : data.slotPopularity,
-    isLoading,
-    error
-  };
-}
-function useGetDailyUsage() {
-  const { data, isLoading, error } = useGetAdminAnalytics();
-  return {
-    data: data == null ? void 0 : data.dailyUsage,
-    isLoading,
-    error
-  };
-}
-function useGetRecentActivity(limit = 20) {
-  const { data, isLoading, error } = useGetAdminAnalytics();
-  return {
-    data: data == null ? void 0 : data.recentActivity.slice(0, limit),
-    isLoading,
-    error
-  };
-}
-function useGetClashFrequency() {
-  const { data, isLoading, error } = useGetAdminAnalytics();
-  return {
-    data: data == null ? void 0 : data.dayAwareClashFrequency,
-    isLoading,
-    error
-  };
-}
-function useTrackEvent() {
-  const { actor } = useActor(createActor);
-  const queryClient2 = useQueryClient();
-  return useMutation({
-    mutationFn: async (event) => {
-      if (!actor) throw new Error("Actor not available");
-      return actor.trackEvent(event);
-    },
-    onSuccess: () => {
-      queryClient2.invalidateQueries({ queryKey: ["adminAnalytics"] });
-    }
-  });
-}
-const AnalyticsContext = reactExports.createContext(
-  void 0
-);
-const SESSION_ID_KEY = "timetable_session_id";
-const SESSION_START_KEY = "timetable_session_start";
-function generateSessionId() {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-}
-function getOrCreateSessionId() {
-  let sessionId = sessionStorage.getItem(SESSION_ID_KEY);
-  if (!sessionId) {
-    sessionId = generateSessionId();
-    sessionStorage.setItem(SESSION_ID_KEY, sessionId);
-    sessionStorage.setItem(SESSION_START_KEY, Date.now().toString());
-  }
-  return sessionId;
-}
-function getSessionDuration() {
-  const startTime = sessionStorage.getItem(SESSION_START_KEY);
-  if (!startTime) return 0;
-  return Date.now() - Number.parseInt(startTime, 10);
-}
-function AnalyticsProvider({ children }) {
-  const [sessionId] = reactExports.useState(getOrCreateSessionId);
-  const { mutate: trackEvent } = useTrackEvent();
-  const trackSessionStart = reactExports.useCallback(() => {
-    trackEvent({
-      sessionId,
-      timestamp: BigInt(Date.now() * 1e6),
-      // Convert to nanoseconds
-      eventType: AnalyticsEventType.sessionStart,
-      slotCount: BigInt(0),
-      courseCount: BigInt(0),
-      duration: BigInt(0),
-      clashCount: BigInt(0),
-      affectedSlots: [],
-      daySpecific: true
-    });
-  }, [sessionId, trackEvent]);
-  const trackCourseCreated = reactExports.useCallback(
-    (courseCount) => {
-      trackEvent({
-        sessionId,
-        timestamp: BigInt(Date.now() * 1e6),
-        eventType: AnalyticsEventType.courseCreated,
-        slotCount: BigInt(0),
-        courseCount: BigInt(courseCount),
-        duration: BigInt(getSessionDuration()),
-        clashCount: BigInt(0),
-        affectedSlots: [],
-        daySpecific: true
-      });
-    },
-    [sessionId, trackEvent]
-  );
-  const trackSlotSelected = reactExports.useCallback(
-    (slotCount) => {
-      trackEvent({
-        sessionId,
-        timestamp: BigInt(Date.now() * 1e6),
-        eventType: AnalyticsEventType.slotSelected,
-        slotCount: BigInt(slotCount),
-        courseCount: BigInt(0),
-        duration: BigInt(getSessionDuration()),
-        clashCount: BigInt(0),
-        affectedSlots: [],
-        daySpecific: true
-      });
-    },
-    [sessionId, trackEvent]
-  );
-  const trackCourseRemoved = reactExports.useCallback(
-    (courseCount) => {
-      trackEvent({
-        sessionId,
-        timestamp: BigInt(Date.now() * 1e6),
-        eventType: AnalyticsEventType.courseRemoved,
-        slotCount: BigInt(0),
-        courseCount: BigInt(courseCount),
-        duration: BigInt(getSessionDuration()),
-        clashCount: BigInt(0),
-        affectedSlots: [],
-        daySpecific: true
-      });
-    },
-    [sessionId, trackEvent]
-  );
-  const trackReset = reactExports.useCallback(() => {
-    trackEvent({
-      sessionId,
-      timestamp: BigInt(Date.now() * 1e6),
-      eventType: AnalyticsEventType.reset,
-      slotCount: BigInt(0),
-      courseCount: BigInt(0),
-      duration: BigInt(getSessionDuration()),
-      clashCount: BigInt(0),
-      affectedSlots: [],
-      daySpecific: true
-    });
-  }, [sessionId, trackEvent]);
-  const trackClashDetected = reactExports.useCallback(
-    (clashCount, affectedSlots) => {
-      trackEvent({
-        sessionId,
-        timestamp: BigInt(Date.now() * 1e6),
-        eventType: AnalyticsEventType.clashDetected,
-        slotCount: BigInt(0),
-        courseCount: BigInt(0),
-        duration: BigInt(getSessionDuration()),
-        clashCount: BigInt(clashCount),
-        affectedSlots,
-        daySpecific: true
-        // All clashes are now day-specific
-      });
-    },
-    [sessionId, trackEvent]
-  );
-  reactExports.useEffect(() => {
-    trackSessionStart();
-  }, [trackSessionStart]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    AnalyticsContext.Provider,
-    {
-      value: {
-        sessionId,
-        trackSessionStart,
-        trackCourseCreated,
-        trackSlotSelected,
-        trackCourseRemoved,
-        trackReset,
-        trackClashDetected
-      },
-      children
-    }
-  );
-}
-function useAnalytics() {
-  const context = reactExports.useContext(AnalyticsContext);
-  if (!context) {
-    throw new Error("useAnalytics must be used within AnalyticsProvider");
-  }
-  return context;
-}
 const SLOT_TIME_MAPPING = {
   // ===== TUE =====
   // Theory: ['TFF1','A1','B1','TC1/G1','D1','F2','A2','B2','TC2/G2','TDD2']
@@ -39214,8 +39055,8 @@ function composeContextScopes(...scopes) {
   createScope.scopeName = baseScope.scopeName;
   return createScope;
 }
-function createCollection(name2) {
-  const PROVIDER_NAME2 = name2 + "CollectionProvider";
+function createCollection(name) {
+  const PROVIDER_NAME2 = name + "CollectionProvider";
   const [createCollectionContext, createCollectionScope2] = createContextScope(PROVIDER_NAME2);
   const [CollectionProviderImpl, useCollectionContext] = createCollectionContext(
     PROVIDER_NAME2,
@@ -39228,7 +39069,7 @@ function createCollection(name2) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(CollectionProviderImpl, { scope, itemMap, collectionRef: ref, children });
   };
   CollectionProvider.displayName = PROVIDER_NAME2;
-  const COLLECTION_SLOT_NAME = name2 + "CollectionSlot";
+  const COLLECTION_SLOT_NAME = name + "CollectionSlot";
   const CollectionSlotImpl = /* @__PURE__ */ createSlot(COLLECTION_SLOT_NAME);
   const CollectionSlot = reactExports.forwardRef(
     (props, forwardedRef) => {
@@ -39239,7 +39080,7 @@ function createCollection(name2) {
     }
   );
   CollectionSlot.displayName = COLLECTION_SLOT_NAME;
-  const ITEM_SLOT_NAME = name2 + "CollectionItemSlot";
+  const ITEM_SLOT_NAME = name + "CollectionItemSlot";
   const ITEM_DATA_ATTR = "data-radix-collection-item";
   const CollectionItemSlotImpl = /* @__PURE__ */ createSlot(ITEM_SLOT_NAME);
   const CollectionItemSlot = reactExports.forwardRef(
@@ -39257,7 +39098,7 @@ function createCollection(name2) {
   );
   CollectionItemSlot.displayName = ITEM_SLOT_NAME;
   function useCollection2(scope) {
-    const context = useCollectionContext(name2 + "CollectionConsumer", scope);
+    const context = useCollectionContext(name + "CollectionConsumer", scope);
     const getItems = reactExports.useCallback(() => {
       const collectionNode = context.collectionRef.current;
       if (!collectionNode) return [];
@@ -39626,10 +39467,10 @@ function dispatchUpdate() {
   const event = new CustomEvent(CONTEXT_UPDATE);
   document.dispatchEvent(event);
 }
-function handleAndDispatchCustomEvent(name2, handler, detail, { discrete }) {
+function handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
   const target = detail.originalEvent.target;
-  const event = new CustomEvent(name2, { bubbles: false, cancelable: true, detail });
-  if (handler) target.addEventListener(name2, handler, { once: true });
+  const event = new CustomEvent(name, { bubbles: false, cancelable: true, detail });
+  if (handler) target.addEventListener(name, handler, { once: true });
   if (discrete) {
     dispatchDiscreteCustomEvent(target, event);
   } else {
@@ -40149,7 +39990,7 @@ const computePosition$1 = async (reference, floating, config2) => {
       continue;
     }
     const {
-      name: name2,
+      name,
       fn
     } = currentMiddleware;
     const {
@@ -40173,8 +40014,8 @@ const computePosition$1 = async (reference, floating, config2) => {
     });
     x3 = nextX != null ? nextX : x3;
     y2 = nextY != null ? nextY : y2;
-    middlewareData[name2] = {
-      ...middlewareData[name2],
+    middlewareData[name] = {
+      ...middlewareData[name],
       ...data
     };
     if (reset && resetCount < MAX_RESET_COUNT) {
@@ -43160,8 +43001,8 @@ function RemoveScrollSideCar(props) {
       }
     }
   }, []);
-  var shouldCancel = reactExports.useCallback(function(name2, delta, target, should) {
-    var event = { name: name2, delta, target, should, shadowParent: getOutermostShadowParent(target) };
+  var shouldCancel = reactExports.useCallback(function(name, delta, target, should) {
+    var event = { name, delta, target, should, shadowParent: getOutermostShadowParent(target) };
     shouldPreventQueue.current.push(event);
     setTimeout(function() {
       shouldPreventQueue.current = shouldPreventQueue.current.filter(function(e3) {
@@ -43245,7 +43086,7 @@ function SelectProvider(props) {
     defaultValue,
     onValueChange,
     dir,
-    name: name2,
+    name,
     autoComplete,
     disabled,
     required,
@@ -43301,7 +43142,7 @@ function SelectProvider(props) {
     dir: direction,
     triggerPointerDownPosRef,
     disabled,
-    name: name2,
+    name,
     autoComplete,
     form,
     nativeOptions: nativeOptionsSet,
@@ -44294,7 +44135,7 @@ var BUBBLE_INPUT_NAME = "SelectBubbleInput";
 var SelectBubbleInput = reactExports.forwardRef(
   ({ __scopeSelect, ...props }, forwardedRef) => {
     const context = useSelectContext(BUBBLE_INPUT_NAME, __scopeSelect);
-    const { value, onValueChange, required, disabled, name: name2, autoComplete, form } = context;
+    const { value, onValueChange, required, disabled, name, autoComplete, form } = context;
     const { nativeOptions, nativeSelectKey } = context;
     const ref = reactExports.useRef(null);
     const composedRefs = useComposedRefs(forwardedRef, ref);
@@ -44324,7 +44165,7 @@ var SelectBubbleInput = reactExports.forwardRef(
         "aria-hidden": true,
         required,
         tabIndex: -1,
-        name: name2,
+        name,
         autoComplete,
         disabled,
         form,
@@ -50559,8 +50400,8 @@ var symbolFactories = {
 };
 var RADIAN$1 = Math.PI / 180;
 var getSymbolFactory = function getSymbolFactory2(type) {
-  var name2 = "symbol".concat(upperFirst$1(type));
-  return symbolFactories[name2] || symbolCircle;
+  var name = "symbol".concat(upperFirst$1(type));
+  return symbolFactories[name] || symbolCircle;
 };
 var calculateAreaSize = function calculateAreaSize2(size2, sizeType, type) {
   if (sizeType === "area") {
@@ -52381,11 +52222,11 @@ var DefaultTooltipContent = function DefaultTooltipContent2(props) {
           color: entry.color || "#000"
         }, itemStyle);
         var finalFormatter = entry.formatter || formatter || defaultFormatter;
-        var value = entry.value, name2 = entry.name;
+        var value = entry.value, name = entry.name;
         var finalValue = value;
-        var finalName = name2;
+        var finalName = name;
         if (finalFormatter && finalValue != null && finalName != null) {
-          var formatted = finalFormatter(value, name2, entry, i, payload);
+          var formatted = finalFormatter(value, name, entry, i, payload);
           if (Array.isArray(formatted)) {
             var _formatted = _slicedToArray$b(formatted, 2);
             finalValue = _formatted[0];
@@ -56166,7 +56007,7 @@ function formatRe(names) {
   return new RegExp("^(?:" + names.map(requote).join("|") + ")", "i");
 }
 function formatLookup(names) {
-  return new Map(names.map((name2, i) => [name2.toLowerCase(), i]));
+  return new Map(names.map((name, i) => [name.toLowerCase(), i]));
 }
 function parseWeekdayNumberSunday(d2, string2, i) {
   var n2 = numberRe.exec(string2.slice(i, i + 1));
@@ -58349,13 +58190,13 @@ var getLegendProps = function getLegendProps2(_ref) {
       var item = _ref3.item;
       var itemDefaultProps = item.type.defaultProps;
       var itemProps = itemDefaultProps !== void 0 ? _objectSpread$r(_objectSpread$r({}, itemDefaultProps), item.props) : {};
-      var dataKey = itemProps.dataKey, name2 = itemProps.name, legendType = itemProps.legendType, hide2 = itemProps.hide;
+      var dataKey = itemProps.dataKey, name = itemProps.name, legendType = itemProps.legendType, hide2 = itemProps.hide;
       return {
         inactive: hide2,
         dataKey,
         type: legendProps.iconType || legendType || "square",
         color: getMainColorOfGraphicItem(item),
-        value: name2 || dataKey,
+        value: name || dataKey,
         // @ts-expect-error property strokeDasharray is required in Payload but optional in props
         payload: itemProps
       };
@@ -58892,10 +58733,10 @@ var parseScale = function parseScale2(axis, chartType, hasBar) {
     };
   }
   if (isString$1(scale)) {
-    var name2 = "scale".concat(upperFirst$1(scale));
+    var name = "scale".concat(upperFirst$1(scale));
     return {
-      scale: (d3Scales[name2] || point)(),
-      realScaleType: d3Scales[name2] ? name2 : "point"
+      scale: (d3Scales[name] || point)(),
+      realScaleType: d3Scales[name] ? name : "point"
     };
   }
   return isFunction$3(scale) ? {
@@ -59230,12 +59071,12 @@ var parseDomainOfCategoryAxis = function parseDomainOfCategoryAxis2(specifiedDom
 };
 var getTooltipItem = function getTooltipItem2(graphicalItem, payload) {
   var defaultedProps = graphicalItem.type.defaultProps ? _objectSpread$q(_objectSpread$q({}, graphicalItem.type.defaultProps), graphicalItem.props) : graphicalItem.props;
-  var dataKey = defaultedProps.dataKey, name2 = defaultedProps.name, unit2 = defaultedProps.unit, formatter = defaultedProps.formatter, tooltipType = defaultedProps.tooltipType, chartType = defaultedProps.chartType, hide2 = defaultedProps.hide;
+  var dataKey = defaultedProps.dataKey, name = defaultedProps.name, unit2 = defaultedProps.unit, formatter = defaultedProps.formatter, tooltipType = defaultedProps.tooltipType, chartType = defaultedProps.chartType, hide2 = defaultedProps.hide;
   return _objectSpread$q(_objectSpread$q({}, filterProps(graphicalItem, false)), {}, {
     dataKey,
     unit: unit2,
     formatter,
-    name: name2 || dataKey,
+    name: name || dataKey,
     color: getMainColorOfGraphicItem(graphicalItem),
     value: getValueByDataKey(payload, dataKey),
     type: tooltipType,
@@ -60410,11 +60251,11 @@ var getCurveFactory = function getCurveFactory2(type, layout) {
   if (isFunction$3(type)) {
     return type;
   }
-  var name2 = "curve".concat(upperFirst$1(type));
-  if ((name2 === "curveMonotone" || name2 === "curveBump") && layout) {
-    return CURVE_FACTORIES["".concat(name2).concat(layout === "vertical" ? "Y" : "X")];
+  var name = "curve".concat(upperFirst$1(type));
+  if ((name === "curveMonotone" || name === "curveBump") && layout) {
+    return CURVE_FACTORIES["".concat(name).concat(layout === "vertical" ? "Y" : "X")];
   }
-  return CURVE_FACTORIES[name2] || curveLinear;
+  return CURVE_FACTORIES[name] || curveLinear;
 };
 var getPath$1 = function getPath(_ref) {
   var _ref$type = _ref.type, type = _ref$type === void 0 ? "linear" : _ref$type, _ref$points = _ref.points, points = _ref$points === void 0 ? [] : _ref$points, baseLine = _ref.baseLine, layout = _ref.layout, _ref$connectNulls = _ref.connectNulls, connectNulls = _ref$connectNulls === void 0 ? false : _ref$connectNulls;
@@ -61121,8 +60962,8 @@ var getIntersectionKeys = function getIntersectionKeys2(preObj, nextObj) {
 var identity2 = function identity22(param) {
   return param;
 };
-var getDashCase = function getDashCase2(name2) {
-  return name2.replace(/([A-Z])/g, function(v2) {
+var getDashCase = function getDashCase2(name) {
+  return name.replace(/([A-Z])/g, function(v2) {
     return "-".concat(v2.toLowerCase());
   });
 };
@@ -62908,14 +62749,14 @@ function _toPrimitive$g(t2, r2) {
   return ("string" === r2 ? String : Number)(t2);
 }
 var PREFIX_LIST = ["Webkit", "Moz", "O", "ms"];
-var generatePrefixStyle = function generatePrefixStyle2(name2, value) {
-  var camelName = name2.replace(/(\w)/, function(v2) {
+var generatePrefixStyle = function generatePrefixStyle2(name, value) {
+  var camelName = name.replace(/(\w)/, function(v2) {
     return v2.toUpperCase();
   });
   var result = PREFIX_LIST.reduce(function(res, entry) {
     return _objectSpread$d(_objectSpread$d({}, res), {}, _defineProperty$g({}, entry + camelName, value));
   }, {});
-  result[name2] = value;
+  result[name] = value;
   return result;
 };
 function _typeof$f(o) {
@@ -67494,10 +67335,10 @@ var eventemitter3 = { exports: {} };
     this._eventsCount = 0;
   }
   EventEmitter2.prototype.eventNames = function eventNames() {
-    var names = [], events2, name2;
+    var names = [], events2, name;
     if (this._eventsCount === 0) return names;
-    for (name2 in events2 = this._events) {
-      if (has.call(events2, name2)) names.push(prefix2 ? name2.slice(1) : name2);
+    for (name in events2 = this._events) {
+      if (has.call(events2, name)) names.push(prefix2 ? name.slice(1) : name);
     }
     if (Object.getOwnPropertySymbols) {
       return names.concat(Object.getOwnPropertySymbols(events2));
@@ -68477,8 +68318,8 @@ var hasGraphicalBarItem = function hasGraphicalBarItem2(graphicalItems) {
     return false;
   }
   return graphicalItems.some(function(item) {
-    var name2 = getDisplayName(item && item.type);
-    return name2 && name2.indexOf("Bar") >= 0;
+    var name = getDisplayName(item && item.type);
+    return name && name.indexOf("Bar") >= 0;
   });
 };
 var getAxisNameByLayout = function getAxisNameByLayout2(layout) {
@@ -68655,8 +68496,8 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
     var graphicalItems = findAllByType(children, GraphicalChild);
     var stackGroups = getStackGroupsByAxisId(data, graphicalItems, "".concat(numericAxisName, "Id"), "".concat(cateAxisName, "Id"), stackOffset, reverseStackOrder);
     var axisObj = axisComponents.reduce(function(result, entry) {
-      var name2 = "".concat(entry.axisType, "Map");
-      return _objectSpread(_objectSpread({}, result), {}, _defineProperty({}, name2, getAxisMap(props, _objectSpread(_objectSpread({}, entry), {}, {
+      var name = "".concat(entry.axisType, "Map");
+      return _objectSpread(_objectSpread({}, result), {}, _defineProperty({}, name, getAxisMap(props, _objectSpread(_objectSpread({}, entry), {}, {
         graphicalItems,
         stackGroups: entry.axisType === numericAxisName && stackGroups,
         dataStartIndex,
@@ -70503,13 +70344,15 @@ function MeetTheCreator() {
   ] });
 }
 function RootComponent() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(AnalyticsProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(J, { attribute: "class", defaultTheme: "system", enableSystem: true, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TimetableApp, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Toaster, {})
-  ] }) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) });
 }
 const rootRoute = createRootRoute({
   component: RootComponent
+});
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: TimetableApp
 });
 function AdminRouteComponent() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(AdminDashboard, {});
@@ -70527,7 +70370,7 @@ const creatorRoute = createRoute({
   path: "/creator",
   component: CreatorRouteComponent
 });
-const routeTree = rootRoute.addChildren([adminRoute, creatorRoute]);
+const routeTree = rootRoute.addChildren([indexRoute, adminRoute, creatorRoute]);
 const router = createRouter({ routeTree });
 function App() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(RouterProvider, { router });
@@ -70537,8 +70380,5 @@ BigInt.prototype.toJSON = function() {
 };
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(InternetIdentityProvider, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Analytics, {})
-  ] }) })
+  /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(InternetIdentityProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) }) })
 );

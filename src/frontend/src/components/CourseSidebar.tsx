@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { CoursesData } from "@/types/timetable";
 import { Edit2, Trash2 } from "lucide-react";
-import type { CoursesData } from "../App";
 
 interface CourseSidebarProps {
   courses: CoursesData;
