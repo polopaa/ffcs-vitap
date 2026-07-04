@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Monochrome — display + body typefaces */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/assets/fonts/BricolageGrotesque.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("/assets/fonts/DMSans.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/assets/fonts/GeistMono.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.625rem;
+
+    /* Fonts */
+    --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, monospace;
+
+    /* Monochrome — light variant (white canvas, black ink) */
+    --background: 1 0 0;
+    --foreground: 0.18 0 0;
+    --card: 0.995 0 0;
+    --card-foreground: 0.18 0 0;
+    --popover: 1 0 0;
+    --popover-foreground: 0.18 0 0;
+    --primary: 0.18 0 0;
+    --primary-foreground: 0.99 0 0;
+    --secondary: 0.96 0 0;
+    --secondary-foreground: 0.18 0 0;
+    --muted: 0.965 0 0;
+    --muted-foreground: 0.45 0 0;
+    --accent: 0.93 0 0;
+    --accent-foreground: 0.12 0 0;
+    --destructive: 0.5 0 0;
+    --destructive-foreground: 0.99 0 0;
+    --border: 0.9 0 0;
+    --input: 0.88 0 0;
+    --ring: 0.18 0 0;
+
+    /* Course palette — 10 distinct hues for course cells/swatches only.
+       App chrome stays monochrome; these are the only colored tokens.
+       Light values: moderate chroma, mid-high lightness for tinted fills. */
+    --course-1: 0.62 0.18 250; /* blue */
+    --course-2: 0.7 0.13 195; /* teal */
+    --course-3: 0.72 0.17 145; /* green */
+    --course-4: 0.82 0.17 125; /* lime */
+    --course-5: 0.82 0.15 85; /* amber */
+    --course-6: 0.7 0.17 50; /* orange */
+    --course-7: 0.62 0.2 27; /* red */
+    --course-8: 0.65 0.2 12; /* rose */
+    --course-9: 0.62 0.19 305; /* violet */
+    --course-10: 0.58 0.18 270; /* indigo */
+
+    /* Clash treatment — high-contrast, no color */
+    --clash-bg: 0.12 0 0;
+    --clash-fg: 0.99 0 0;
+    --clash-border: 0.12 0 0;
+
+    /* Gradients & transitions */
+    --gradient-subtle: linear-gradient(180deg, oklch(1 0 0), oklch(0.965 0 0));
+    --gradient-ink: linear-gradient(135deg, oklch(0.12 0 0), oklch(0.18 0 0));
+    --transition-smooth: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-luxe: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+
+    --chart-1: 0.12 0 0;
+    --chart-2: 0.32 0 0;
+    --chart-3: 0.5 0 0;
+    --chart-4: 0.68 0 0;
+    --chart-5: 0.82 0 0;
+
+    --sidebar: 0.975 0 0;
+    --sidebar-foreground: 0.18 0 0;
+    --sidebar-primary: 0.18 0 0;
+    --sidebar-primary-foreground: 0.99 0 0;
+    --sidebar-accent: 0.94 0 0;
+    --sidebar-accent-foreground: 0.12 0 0;
+    --sidebar-border: 0.9 0 0;
+    --sidebar-ring: 0.18 0 0;
+  }
+
+  .dark {
+    /* Monochrome — dark variant (near-black canvas, white ink) */
+    --background: 0.13 0 0;
+    --foreground: 0.96 0 0;
+    --card: 0.17 0 0;
+    --card-foreground: 0.96 0 0;
+    --popover: 0.17 0 0;
+    --popover-foreground: 0.96 0 0;
+    --primary: 0.98 0 0;
+    --primary-foreground: 0.13 0 0;
+    --secondary: 0.22 0 0;
+    --secondary-foreground: 0.96 0 0;
+    --muted: 0.2 0 0;
+    --muted-foreground: 0.62 0 0;
+    --accent: 0.24 0 0;
+    --accent-foreground: 0.96 0 0;
+    --destructive: 0.65 0 0;
+    --destructive-foreground: 0.13 0 0;
+    --border: 0.26 0 0;
+    --input: 0.28 0 0;
+    --ring: 0.96 0 0;
+
+    --clash-bg: 0.96 0 0;
+    --clash-fg: 0.13 0 0;
+    --clash-border: 0.96 0 0;
+
+    /* Course palette — dark variant: deeper lightness, slightly higher chroma
+       so colors stay vivid and readable on the near-black canvas. */
+    --course-1: 0.68 0.16 250;
+    --course-2: 0.74 0.13 195;
+    --course-3: 0.76 0.16 145;
+    --course-4: 0.84 0.16 125;
+    --course-5: 0.84 0.15 85;
+    --course-6: 0.74 0.17 50;
+    --course-7: 0.68 0.19 27;
+    --course-8: 0.7 0.19 12;
+    --course-9: 0.7 0.18 305;
+    --course-10: 0.66 0.17 270;
+
+    --gradient-subtle: linear-gradient(180deg, oklch(0.17 0 0), oklch(0.13 0 0));
+    --gradient-ink: linear-gradient(135deg, oklch(0.96 0 0), oklch(0.85 0 0));
+
+    --chart-1: 0.96 0 0;
+    --chart-2: 0.7 0 0;
+    --chart-3: 0.5 0 0;
+    --chart-4: 0.35 0 0;
+    --chart-5: 0.22 0 0;
+
+    --sidebar: 0.15 0 0;
+    --sidebar-foreground: 0.96 0 0;
+    --sidebar-primary: 0.98 0 0;
+    --sidebar-primary-foreground: 0.13 0 0;
+    --sidebar-accent: 0.22 0 0;
+    --sidebar-accent-foreground: 0.96 0 0;
+    --sidebar-border: 0.26 0 0;
+    --sidebar-ring: 0.96 0 0;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    font-feature-settings: "ss01" 1, "cv01" 1;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-body {
+    font-family: var(--font-body);
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* Monochrome gradient surfaces */
+  .bg-subtle {
+    background-image: var(--gradient-subtle);
+  }
+  .bg-ink {
+    background-image: var(--gradient-ink);
+  }
+
+  /* Course color utilities — tinted background fill + solid left border.
+     Consumed by CourseModal swatches and TimetableCell. */
+  .course-1 {
+    background-color: oklch(var(--course-1) / 0.18);
+    border-left: 3px solid oklch(var(--course-1));
+  }
+  .course-2 {
+    background-color: oklch(var(--course-2) / 0.18);
+    border-left: 3px solid oklch(var(--course-2));
+  }
+  .course-3 {
+    background-color: oklch(var(--course-3) / 0.18);
+    border-left: 3px solid oklch(var(--course-3));
+  }
+  .course-4 {
+    background-color: oklch(var(--course-4) / 0.18);
+    border-left: 3px solid oklch(var(--course-4));
+  }
+  .course-5 {
+    background-color: oklch(var(--course-5) / 0.18);
+    border-left: 3px solid oklch(var(--course-5));
+  }
+  .course-6 {
+    background-color: oklch(var(--course-6) / 0.18);
+    border-left: 3px solid oklch(var(--course-6));
+  }
+  .course-7 {
+    background-color: oklch(var(--course-7) / 0.18);
+    border-left: 3px solid oklch(var(--course-7));
+  }
+  .course-8 {
+    background-color: oklch(var(--course-8) / 0.18);
+    border-left: 3px solid oklch(var(--course-8));
+  }
+  .course-9 {
+    background-color: oklch(var(--course-9) / 0.18);
+    border-left: 3px solid oklch(var(--course-9));
+  }
+  .course-10 {
+    background-color: oklch(var(--course-10) / 0.18);
+    border-left: 3px solid oklch(var(--course-10));
+  }
+
+  /* Solid course swatch — used for picker chips and sidebar dots */
+  .course-swatch-1 {
+    background-color: oklch(var(--course-1));
+  }
+  .course-swatch-2 {
+    background-color: oklch(var(--course-2));
+  }
+  .course-swatch-3 {
+    background-color: oklch(var(--course-3));
+  }
+  .course-swatch-4 {
+    background-color: oklch(var(--course-4));
+  }
+  .course-swatch-5 {
+    background-color: oklch(var(--course-5));
+  }
+  .course-swatch-6 {
+    background-color: oklch(var(--course-6));
+  }
+  .course-swatch-7 {
+    background-color: oklch(var(--course-7));
+  }
+  .course-swatch-8 {
+    background-color: oklch(var(--course-8));
+  }
+  .course-swatch-9 {
+    background-color: oklch(var(--course-9));
+  }
+  .course-swatch-10 {
+    background-color: oklch(var(--course-10));
+  }
+
+  /* Clash treatment — inverted high-contrast surface */
+  .clash-surface {
+    background-color: oklch(var(--clash-bg));
+    color: oklch(var(--clash-fg));
+    border: 1px solid oklch(var(--clash-border));
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  .transition-luxe {
+    transition: var(--transition-luxe);
+  }
+}

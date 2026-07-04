@@ -1,0 +1,72 @@
+// Version: 1.0.0
+type AnalyticsEventType__9081716 =
+  {
+    #clashDetected;
+    #courseCreated;
+    #courseRemoved;
+    #reset;
+    #sessionStart;
+    #slotSelected
+  };
+type AnalyticsEvent__531657855 =
+  {
+    affectedSlots : [Text];
+    clashCount : Nat;
+    courseCount : Nat;
+    daySpecific : Bool;
+    duration : Nat;
+    eventType : AnalyticsEventType__9081716;
+    sessionId : Text;
+    slotCount : Nat;
+    timestamp : Time__837879871
+  };
+type Data__552063367<K, V> = {var count : Nat__93962160; kvs : [var ?(K, V)]};
+type Int__616954475 = Int;
+type Int__849411254 = Int__616954475;
+type Internal__455405067<K, V> =
+  {children : [var ?Node__279997185<K, V>]; data : Data__552063367<K, V>};
+type Leaf__114713147<K, V> = {data : Data__552063367<K, V>};
+type Map__190625089<K, V> = Map__719753394<K, V>;
+type Map__246123559<K, V> = Map__190625089<K, V>;
+type Map__719753394<K, V> =
+  {var root : Node__279997185<K, V>; var size : Nat__93962160};
+type Nat__920180692 = Nat;
+type Nat__93962160 = Nat__920180692;
+type Node__279997185<K, V> =
+  {#internal : Internal__455405067<K, V>; #leaf : Leaf__114713147<K, V>};
+type Time__72294698 = Int__849411254;
+type Time__837879871 = Time__72294698;
+type TimetableSlot__481634928 = {day : Nat; id : Text; timePeriod : Nat};
+type UserProfile__491224006 = {name : Text};
+type UserRole__686137147 = {#admin; #guest; #user};
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__246123559<Principal, UserRole__686137147>
+    };
+  stable var analyticsEvents :
+    {
+      var blockIndex : Nat__93962160;
+      var blocks : [var [var ?AnalyticsEvent__531657855]];
+      var elementIndex : Nat__93962160
+    };
+  stable clashFrequency :
+    {var root : Node__279997185<Text, Nat>; var size : Nat__93962160};
+  stable dailyUsage :
+    {var root : Node__279997185<Text, Nat>; var size : Nat__93962160};
+  stable sessionIds :
+    {var root : Node__279997185<Text, ()>; var size : Nat__93962160};
+  stable slotPopularity :
+    {var root : Node__279997185<Text, Nat>; var size : Nat__93962160};
+  stable timetableSlots :
+    {
+      var root : Node__279997185<Text, TimetableSlot__481634928>;
+      var size : Nat__93962160
+    };
+  stable userProfiles :
+    {
+      var root : Node__279997185<Principal, UserProfile__491224006>;
+      var size : Nat__93962160
+    }
+};

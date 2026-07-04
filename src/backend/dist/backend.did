@@ -1,0 +1,133 @@
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = record {name: text;};
+type TimetableSlot = 
+ record {
+   day: nat;
+   id: text;
+   timePeriod: nat;
+ };
+type Time = int;
+type Result = 
+ variant {
+   err: Error;
+   ok;
+ };
+type Error = 
+ variant {
+   AmbiguousAttribute: record {
+                         field: text;
+                         sources: vec text;
+                       };
+   FrontendOriginMismatch: record {
+                             expected: vec text;
+                             got: text;
+                           };
+   FrontendOriginsNotConfigured;
+   MalformedCandid;
+   MissingField: text;
+   MixedSsoSources: record {
+                      otherKeys: vec text;
+                      ssoKeys: vec text;
+                    };
+   NoAttributes;
+   Stale: record {ageNs: nat;};
+   UnknownNonce;
+   UntrustedSsoSource: record {domain: text;};
+ };
+type AnalyticsEventType = 
+ variant {
+   clashDetected;
+   courseCreated;
+   courseRemoved;
+   reset;
+   sessionStart;
+   slotSelected;
+ };
+type AnalyticsEvent = 
+ record {
+   affectedSlots: vec text;
+   clashCount: nat;
+   courseCount: nat;
+   daySpecific: bool;
+   duration: nat;
+   eventType: AnalyticsEventType;
+   sessionId: text;
+   slotCount: nat;
+   timestamp: Time;
+ };
+type AdminAnalyticsResponse = 
+ record {
+   averageSlotsPerSession: nat;
+   dailyUsage: vec record {
+                     text;
+                     nat;
+                   };
+   dayAwareClashFrequency: vec record {
+                                 text;
+                                 nat;
+                               };
+   recentActivity: vec AnalyticsEvent;
+   slotPopularity: vec record {
+                         text;
+                         nat;
+                       };
+   totalCourses: nat;
+   totalSessions: nat;
+   uniqueUsers: nat;
+ };
+service : {
+  __accessControlState: () -> (reserved) query;
+  __analyticsEvents: (io: opt nat, count: opt nat) ->
+   (vec AnalyticsEvent) query;
+  __clashFrequency: (ko: opt text, count: opt nat) ->
+   (vec record {
+          text;
+          nat;
+        }) query;
+  __dailyUsage: (ko: opt text, count: opt nat) ->
+   (vec record {
+          text;
+          nat;
+        }) query;
+  __sessionIds: (ko: opt text, count: opt nat) ->
+   (vec record {
+          text;
+          null;
+        }) query;
+  __slotPopularity: (ko: opt text, count: opt nat) ->
+   (vec record {
+          text;
+          nat;
+        }) query;
+  __timetableSlots: (ko: opt text, count: opt nat) ->
+   (vec record {
+          text;
+          TimetableSlot;
+        }) query;
+  __userProfiles: (ko: opt principal, count: opt nat) ->
+   (vec record {
+          principal;
+          UserProfile;
+        }) query;
+  _initialize_access_control: () -> ();
+  _internet_identity_sign_in_finish: () -> (Result);
+  _internet_identity_sign_in_start: () -> (blob);
+  addTimetableSlot: (slot: TimetableSlot) -> ();
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  getAdminAnalytics: (adminKey: text) -> (AdminAnalyticsResponse) query;
+  getAllTimetableSlots: () -> (vec TimetableSlot) query;
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getDayLabel: (day: nat) -> (opt text) query;
+  getTimePeriodLabel: (timePeriod: nat) -> (opt text) query;
+  getTimetableSlot: (slotId: text) -> (opt TimetableSlot) query;
+  getUserProfile: (user: principal) -> (opt UserProfile) query;
+  isCallerAdmin: () -> (bool) query;
+  saveCallerUserProfile: (profile: UserProfile) -> ();
+  trackEvent: (event: AnalyticsEvent) -> ();
+}
