@@ -6,6 +6,8 @@ import {
   createRouter,
 } from "@tanstack/react-router";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/react";
+
 import TimetableApp from "./components/TimetableApp";
 import { AnalyticsProvider } from "./hooks/useAnalytics";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -15,9 +17,9 @@ export interface Course {
   id: string;
   name: string;
   color: string;
-  selectedSlots: string[]; // Selection keys (e.g., "A1", "A2::SB1", "C1", "L1", "L2")
-  credit: number; // 0 for lab courses | 1 | 2 | 3 | 4 for theory — credit value of the chosen combination
-  combination: string; // Raw combination string (e.g. "A1+TA1+TAA1" for theory, "L1+L2" for lab)
+  selectedSlots: string[];
+  credit: number;
+  combination: string;
 }
 
 export interface CoursesData {
@@ -31,41 +33,32 @@ function RootComponent() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TimetableApp />
         <Toaster />
+        <Analytics />
       </ThemeProvider>
     </AnalyticsProvider>
   );
 }
 
-// Root route with layout
+// Root route
 const rootRoute = createRootRoute({
   component: RootComponent,
 });
 
-// Admin route component
-function AdminRouteComponent() {
-  return <AdminDashboard />;
-}
-
-// Meet the Creator route component
-function CreatorRouteComponent() {
-  return <MeetTheCreator />;
-}
-
-// Admin route with key validation
+// Admin route
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin-insights",
-  component: AdminRouteComponent,
+  component: AdminDashboard,
 });
 
-// Meet the Creator route
+// Creator route
 const creatorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/creator",
-  component: CreatorRouteComponent,
+  component: MeetTheCreator,
 });
 
-// Create router
+// Router
 const routeTree = rootRoute.addChildren([adminRoute, creatorRoute]);
 const router = createRouter({ routeTree });
 
