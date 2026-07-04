@@ -33,14 +33,15 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
+    <>
     <AnalyticsProvider>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         {children}
         <Toaster />
       </ThemeProvider>
-      <Analytics />
     </AnalyticsProvider>
-
+    <Analytics />
+    </>
   );
 }
 
