@@ -14,15 +14,7 @@ export default function Footer() {
       <div className="mx-auto w-full max-w-[1600px] px-4 md:px-6">
         <div className="flex flex-col items-center gap-3 md:flex-row md:justify-between">
           <p className="font-body text-center text-xs text-muted-foreground md:text-left">
-            © {year}. Built with love using{" "}
-            <a
-              href={caffeineUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-foreground underline-offset-4 transition-smooth hover:text-primary hover:underline"
-            >
-              caffeine.ai
-            </a>
+            © {year}. Built by a student for the students.
           </p>
           <nav className="flex items-center gap-4">
             <Link
