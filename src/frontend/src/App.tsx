@@ -5,12 +5,12 @@ import {
   createRoute,
   createRouter,
 } from "@tanstack/react-router";
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import TimetableApp from "./components/TimetableApp";
 import { AnalyticsProvider } from "./hooks/useAnalytics";
 import AdminDashboard from "./pages/AdminDashboard";
 import MeetTheCreator from "./pages/MeetTheCreator";
-import { Analytics } from "@vercel/analytics/react";
 
 export interface Course {
   id: string;
@@ -75,7 +75,6 @@ declare module "@tanstack/react-router" {
     router: typeof router;
   }
 }
-
 
 function App() {
   return (
