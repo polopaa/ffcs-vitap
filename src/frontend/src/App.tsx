@@ -33,7 +33,6 @@ function RootComponent() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TimetableApp />
         <Toaster />
-        <Analytics />
       </ThemeProvider>
     </AnalyticsProvider>
   );
@@ -69,7 +68,12 @@ declare module "@tanstack/react-router" {
 }
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Analytics />
+    </>
+  );
 }
 
 export default App;
