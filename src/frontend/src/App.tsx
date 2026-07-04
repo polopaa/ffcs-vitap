@@ -10,6 +10,7 @@ import TimetableApp from "./components/TimetableApp";
 import { AnalyticsProvider } from "./hooks/useAnalytics";
 import AdminDashboard from "./pages/AdminDashboard";
 import MeetTheCreator from "./pages/MeetTheCreator";
+import { Analytics } from "@vercel/analytics/react";
 
 export interface Course {
   id: string;
@@ -75,8 +76,14 @@ declare module "@tanstack/react-router" {
   }
 }
 
+
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Analytics />
+    </>
+  );
 }
 
 export default App;
