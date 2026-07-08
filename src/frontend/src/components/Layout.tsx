@@ -1,8 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { AnalyticsProvider } from "@/hooks/useAnalytics";
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
-import { Analytics } from "@vercel/analytics/react"
 
 /**
  * Reusable application shell.
@@ -38,7 +38,7 @@ export function Layout({ children }: LayoutProps) {
         {children}
         <Toaster />
       </ThemeProvider>
-      <Analytics/>
+      <Analytics />
     </AnalyticsProvider>
   );
 }
